@@ -36,6 +36,9 @@ class UserController extends Controller
         $address = $request->post('address');
         $postcode = $request->post('postcode');
 
+        if ($this->userRepository->findByUser($username)) {
+            $username = '-1';
+        }
 
         $validation = new RegistrationFormValidation($username, $password, $fullname, $address, $postcode);
 

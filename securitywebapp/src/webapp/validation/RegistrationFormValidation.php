@@ -3,10 +3,12 @@
 namespace tdt4237\webapp\validation;
 
 use tdt4237\webapp\models\User;
+use tdt4237\webapp\repository\UserRepository;
 
 class RegistrationFormValidation
 {
     const MIN_USER_LENGTH = 3;
+    const MAX_USER_LENGTH = 16;
     
     private $validationErrors = [];
     
@@ -43,12 +45,24 @@ class RegistrationFormValidation
             $this->validationErrors[] = "Please write in your post code";
         }
 
-        if (strlen($postcode) != "4") {
+        if (strlen($postcode) != 4) {
             $this->validationErrors[] = "Post code must be exactly four digits";
         }
 
-        if (preg_match('/^[A-Za-z0-9_]+$/', $username) === 0) {
-            $this->validationErrors[] = 'Username can only contain letters and numbers';
+        if ($username === '-1') {
+            $this->validationErrors[] = "Username already exists";
         }
+
+        else {
+            if (strlen($username) < $this::MIN_USER_LENGTH or strlen($username) >= $this::MAX_USER_LENGTH) {
+                $this->validationErrors[] = 'Username must be between 3 and 16 characters';
+            }
+
+            if (preg_match('/^[A-Za-z0-9_]+$/', $username) === 0) {
+                $this->validationErrors[] = 'Username can only contain letters and numbers';
+            }
+
+        }
+
     }
 }

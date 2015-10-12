@@ -10,12 +10,14 @@ use tdt4237\webapp\models\User;
 
 class UserRepository
 {
-    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s')";
+    const INSERT_QUERY   = "INSERT INTO users(user, hash, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s', '%s')";
     const UPDATE_QUERY   = "UPDATE users SET email='%s', age='%s', bio='%s', isadmin='%s', fullname ='%s', address = '%s', postcode = '%s' WHERE id='%s'";
     const FIND_BY_NAME   = "SELECT * FROM users WHERE user='%s'";
     const DELETE_BY_NAME = "DELETE FROM users WHERE user='%s'";
     const SELECT_ALL     = "SELECT * FROM users";
     const FIND_FULL_NAME   = "SELECT * FROM users WHERE user='%s'";
+    const FIND_USER_HAHSH = "SELECT hash FROM users WHERE user='@s'";
+    const SET_USER_HASH = "UPDATE users SET hash='%s' WHERE id='%s'";
 
     /**
      * @var PDO
@@ -71,7 +73,16 @@ class UserRepository
 
         return $this->makeUserFromRow($row);
     }
-
+    public function setHash($username)
+    {
+        $query = sprintf(self::FIND_USER_HAHSH, $username);
+        $result =  $this->pdo->query($query, PDO::FETCH_ASSOC);
+        if ($result === false)
+        {
+            return false;
+        }
+        return $result;
+    }
     public function deleteByUsername($username)
     {
         return $this->pdo->exec(

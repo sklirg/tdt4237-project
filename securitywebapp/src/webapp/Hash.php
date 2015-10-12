@@ -3,12 +3,31 @@
 namespace tdt4237\webapp;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use tdt4237\webapp\repository\UserRepository;
 
 class Hash
 {
+    // Using php 5.5 hashing api
+    // see https://gist.github.com/nikic/3707231
+    public function CheckAPIpassword($password, $hash)
+    {
+        //TODO find hash from database
+        $hash = Null;
+        if (!pasword_verify($password, $hash))
+        {
+            return false;
+        }
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT)){
+            $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    static $salt = "1234";
+        }
+        return true;
+    }
 
+    public static function createAPIHash($password)
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
 
     public function __construct()
     {

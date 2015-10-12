@@ -34,9 +34,9 @@ class Sql
 
     static function insertDummyUsers()
     {
-        $hash1 = Hash::make(bin2hex(openssl_random_pseudo_bytes(2)));
-        $hash2 = Hash::make('bobdylan');
-        $hash3 = Hash::make('liverpool');
+        $hash1 = Hash::createAPIHash(bin2hex(openssl_random_pseudo_bytes(2)));
+        $hash2 = Hash::createAPIHash('bobdylan');
+        $hash3 = Hash::createAPIHash('liverpool');
 
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
         $q2 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
@@ -66,7 +66,6 @@ class Sql
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
-
 
     }
 

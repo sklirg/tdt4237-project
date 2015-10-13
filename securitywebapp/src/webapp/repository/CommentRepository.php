@@ -13,7 +13,7 @@ class CommentRepository
      */
     private $db;
 
-    const SELECT_BY_ID = "SELECT * FROM moviereviews WHERE id = %s";
+    const SELECT_BY_ID = "SELECT * FROM moviereviews WHERE id = %s"; // This one does nothing afaik... moviereviews sounds like an old version
 
     public function __construct(PDO $db)
     {
@@ -32,9 +32,17 @@ class CommentRepository
 
 
         if ($comment->getCommentId() === null) {
-            $query = "INSERT INTO comments (author, text, date, belongs_to_post) "
-                . "VALUES ('$author', '$text', '$date', '$postid')";
-            return $this->db->exec($query);
+            // Prepare SQL statement
+            $stmt = $this->db->prepare('INSERT INTO comments (author, text, date, belongs_to_post) '.
+                "VALUES (:author, :text, :date, :postid)"
+            );
+            // Bind parameters to their respective values
+            $stmt->bindParam(":author", $author);
+            $stmt->bindParam(":text", $text);
+            $stmt->bindParam(":date", $date);
+            $stmt->bindParam(":postid", $postid);
+            // Execute query
+            return $stmt->execute();
         }
     }
 

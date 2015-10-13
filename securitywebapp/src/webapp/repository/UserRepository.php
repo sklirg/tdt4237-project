@@ -10,6 +10,7 @@ use tdt4237\webapp\models\User;
 
 class UserRepository
 {
+    /* Should not be required anymore
     const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s', '%s')";
     const UPDATE_QUERY   = "UPDATE users SET email='%s', age='%s', bio='%s', isadmin='%s', fullname ='%s', address = '%s', postcode = '%s' WHERE id='%s'";
     const FIND_BY_NAME   = "SELECT * FROM users WHERE user='%s'";
@@ -18,6 +19,7 @@ class UserRepository
     const FIND_FULL_NAME   = "SELECT * FROM users WHERE user='%s'";
     const FIND_USER_HASH = "SELECT pass FROM users WHERE user='@s'";
     const SET_USER_HASH = "UPDATE users SET pass='%s' WHERE user='%s'";
+    */
 
     /**
      * @var PDO
@@ -52,26 +54,43 @@ class UserRepository
 
     public function getNameByUsername($username)
     {
-        $query = sprintf(self::FIND_FULL_NAME, $username);
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
+        // Bind parameters to their respective values
+        $stmt->bindParam(":username", $username);
+        // Execute query
+        $stmt->execute();
 
-        $result = $this->pdo->query($query, PDO::FETCH_ASSOC);
-        $row = $result->fetch();
+        $row = $stmt;
         return $row['fullname'];
-
     }
 
     public function findByUser($username)
     {
-        $query  = sprintf(self::FIND_BY_NAME, $username);
-        $result = $this->pdo->query($query, PDO::FETCH_ASSOC);
-        $row = $result->fetch();
-        
-        if ($row === false) {
-            return false;
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
+        // Bind parameters to their respective values
+        $stmt->bindParam(":username", $username);
+        // Execute query
+        $stmt->execute();
+
+        // Don't ask
+        /*
+         * But if you must
+         * I have no idea how the $stmt-syntax works.
+         * $stmt->execute() returns an object, but makeUserFromRow requires a row.
+         * Therefore, loop through the (one) result, if it's nothing return false,
+         * otherwise, create a user.
+         * Sure. Why not.
+         */
+        foreach ($stmt as $row) {
+            if ($row === false) {
+                return false;
+            }
+            return $this->makeUserFromRow($row);
         }
 
 
-        return $this->makeUserFromRow($row);
     }
     public function setHash($hash, $username)
     {
@@ -89,9 +108,12 @@ class UserRepository
     }
     public function deleteByUsername($username)
     {
-        return $this->pdo->exec(
-            sprintf(self::DELETE_BY_NAME, $username)
-        );
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE user=:username");
+        // Bind parameters to their respective values
+        $stmt->bindParam(":username", $username);
+        // Execute query
+        return $stmt->execute();
     }
 
 
@@ -119,20 +141,43 @@ class UserRepository
 
     public function saveNewUser(User $user)
     {
-        $query = sprintf(
-            self::INSERT_QUERY, $user->getUsername(), $user->getHash(), $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode()
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare("INSERT INTO users (user, pass, email, age, bio, isadmin, fullname, address, postcode) " .
+            "VALUES (:user, :pass, :email, :age, :bio, :isadmin, :fullname, :address, :postcode)"
         );
-
-        return $this->pdo->exec($query);
+        print_r($user->getUsername());
+        // Bind parameters to their respective values
+        // Execute and bind values all in one
+        return $stmt->execute([
+            'user'=>$user->getUsername(),
+            'pass'=>$user->getHash(),
+            'email'=>$user->getEmail(),
+            'age'=>$user->getAge(),
+            'bio'=>$user->getBio(),
+            'isadmin'=>$user->isAdmin(),
+            'fullname'=>$user->getFullname(),
+            'address'=>$user->getAddress(),
+            'postcode'=>$user->getPostcode()
+        ]);
     }
 
     public function saveExistingUser(User $user)
     {
-        $query = sprintf(
-            self::UPDATE_QUERY, $user->getEmail(), $user->getAge(), $user->getBio(), $user->isAdmin(), $user->getFullname(), $user->getAddress(), $user->getPostcode(), $user->getUserId()
+        // Prepare statement
+        $stmt = $this->pdo->prepare("UPDATE users " .
+            "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
         );
-
-        return $this->pdo->exec($query);
+        // Execute and bind values all in one
+        $stmt->execute([
+            'userid'=>$user->getUserId(),
+            'email'=>$user->getEmail(),
+            'age'=>$user->getAge(),
+            'bio'=>$user->getBio(),
+            'isadmin'=>$user->isAdmin(),
+            'fullname'=>$user->getFullname(),
+            'address'=>$user->getAddress(),
+            'postcode'=>$user->getPostcode()
+        ]);
     }
 
 }

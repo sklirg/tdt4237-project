@@ -1,28 +1,34 @@
 <?php
 
 namespace tdt4237\webapp;
-
 use Symfony\Component\Config\Definition\Exception\Exception;
+use tdt4237\webapp\repository\UserRepository;
 
 class Hash
 {
-
-    static $salt = "1234";
-
-
-    public function __construct()
+    private $userRepository;
+    public function __construct(UserRepository $userRepository)
     {
+        $this ->userRepository = $userRepository;
     }
 
-    public static function make($plaintext)
+    // Using php 5.5 hashing api
+    // see https://gist.github.com/nikic/3707231
+    public function CheckAPIpassword($password, $user)
     {
-        return hash('sha1', $plaintext . Hash::$salt);
-
+        $hash = $this->userRepository->getHash($user);
+        if (!password_verify($password, $hash))
+        {
+            return false;
+        }
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT)){
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $this->userRepository->setHash($hash, $user);
+        }
+        return true;
     }
-
-    public function check($plaintext, $hash)
+    public static function createAPIHash($password)
     {
-        return $this->make($plaintext) === $hash;
+        return password_hash($password, PASSWORD_DEFAULT);
     }
-
 }

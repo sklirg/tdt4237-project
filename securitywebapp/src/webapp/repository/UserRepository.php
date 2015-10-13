@@ -10,12 +10,14 @@ use tdt4237\webapp\models\User;
 
 class UserRepository
 {
-    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s')";
+    const INSERT_QUERY   = "INSERT INTO users(user, pass, email, age, bio, isadmin, fullname, address, postcode) VALUES('%s', '%s' , '%s' , '%s', '%s', '%s', '%s', '%s', '%s')";
     const UPDATE_QUERY   = "UPDATE users SET email='%s', age='%s', bio='%s', isadmin='%s', fullname ='%s', address = '%s', postcode = '%s' WHERE id='%s'";
     const FIND_BY_NAME   = "SELECT * FROM users WHERE user='%s'";
     const DELETE_BY_NAME = "DELETE FROM users WHERE user='%s'";
     const SELECT_ALL     = "SELECT * FROM users";
     const FIND_FULL_NAME   = "SELECT * FROM users WHERE user='%s'";
+    const FIND_USER_HASH = "SELECT pass FROM users WHERE user='@s'";
+    const SET_USER_HASH = "UPDATE users SET pass='%s' WHERE user='%s'";
 
     /**
      * @var PDO
@@ -71,7 +73,20 @@ class UserRepository
 
         return $this->makeUserFromRow($row);
     }
+    public function setHash($hash, $username)
+    {
+        $query = "UPDATE users SET pass=:password WHERE user=:user";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['password'=>$hash, 'user'=>$username]);
+    }
 
+    public function getHash($user)
+    {
+        $query = "SELECT pass FROM users WHERE user=:user";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['user'=>$user]);
+        return $statement->fetchColumn();
+    }
     public function deleteByUsername($username)
     {
         return $this->pdo->exec(

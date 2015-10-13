@@ -16,7 +16,7 @@ chmod(__DIR__ . '/../web/uploads', 0700);
 
 $app = new Slim([
     'templates.path' => __DIR__.'/webapp/templates/',
-    'debug' => true,
+    'debug' => false,
     'view' => new Twig()
 
 ]);
@@ -40,10 +40,10 @@ try {
 
 date_default_timezone_set("Europe/Oslo");
 
-$app->hash = new Hash();
 $app->userRepository = new UserRepository($app->db);
 $app->postRepository = new PostRepository($app->db);
 $app->commentRepository = new CommentRepository($app->db);
+$app->hash = new Hash($app->userRepository);
 $app->auth = new Auth($app->userRepository, $app->hash);
 
 $ns ='tdt4237\\webapp\\controllers\\';

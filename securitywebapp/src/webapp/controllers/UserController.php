@@ -32,15 +32,18 @@ class UserController extends Controller
         $request  = $this->app->request;
         $username = $request->post('user');
         $password = $request->post('pass');
+        $retypePass = $request->post('retypepass');
         $fullname = $request->post('fullname');
         $address = $request->post('address');
         $postcode = $request->post('postcode');
+
+        
 
         if ($this->userRepository->findByUser($username)) {
             $username = '-1';
         }
 
-        $validation = new RegistrationFormValidation($username, $password, $fullname, $address, $postcode);
+        $validation = new RegistrationFormValidation($username, $password, $retypePass, $fullname, $address, $postcode);
 
         if ($validation->isGoodToGo()) {
             $password = $password;

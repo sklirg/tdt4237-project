@@ -47,7 +47,7 @@ class UserController extends Controller
 
         if ($validation->isGoodToGo()) {
             $password = $password;
-            $password = $this->hash->make($password);
+            $password = $this->hash->createAPIHash($password);
             $user = new User($username, $password, $fullname, $address, $postcode);
             $this->userRepository->save($user);
 

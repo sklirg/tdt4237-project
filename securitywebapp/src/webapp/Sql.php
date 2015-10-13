@@ -7,6 +7,7 @@ use tdt4237\webapp\models\User;
 class Sql
 {
     static $pdo;
+    private $userRepository;
 
     function __construct()
     {
@@ -17,7 +18,7 @@ class Sql
      */
     static function up()
     {
-        $q1 = "CREATE TABLE users (id INTEGER PRIMARY KEY, user VARCHAR(50), pass VARCHAR(50), email varchar(50) default null, fullname varchar(50), address varchar(50), postcode varchar (4), age varchar(50), bio varhar(50), isadmin INTEGER);";
+        $q1 = "CREATE TABLE users (id INTEGER PRIMARY KEY, user VARCHAR(50), pass VARCHAR(255), email varchar(50) default null, fullname varchar(50), address varchar(50), postcode varchar (4), age varchar(50), bio varhar(50), isadmin INTEGER);";
         $q6 = "CREATE TABLE posts (postId INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, title TEXT NOT NULL, content TEXT NOT NULL, date TEXT NOT NULL, FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(commentId INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, author TEXT NOT NULL, text INTEGER NOT NULL, belongs_to_post INTEGER NOT NULL, FOREIGN KEY(belongs_to_post) REFERENCES posts(postId));";
 
@@ -34,9 +35,9 @@ class Sql
 
     static function insertDummyUsers()
     {
-        $hash1 = Hash::make(bin2hex(openssl_random_pseudo_bytes(2)));
-        $hash2 = Hash::make('bobdylan');
-        $hash3 = Hash::make('liverpool');
+        $hash1 = Hash::createAPIHash(bin2hex(openssl_random_pseudo_bytes(2)));
+        $hash2 = Hash::createAPIHash('bobdylan');
+        $hash3 = Hash::createAPIHash('liverpool');
 
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
         $q2 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
@@ -66,7 +67,6 @@ class Sql
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         print "[tdt4237] Done inserting comments.".PHP_EOL;
-
 
     }
 

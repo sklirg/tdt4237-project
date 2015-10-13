@@ -33,7 +33,7 @@ class Auth
             return false;
         }
 
-        return $this->hash->check($password, $user->getHash());
+        return $this->hash->CheckAPIpassword($password, $username);
     }
 
     /**
@@ -84,7 +84,8 @@ class Auth
 
     public function logout()
     {
-        if($this->guest()) {
+        if($this->check()) {
+            session_unset();
             session_destroy();
         }
     }

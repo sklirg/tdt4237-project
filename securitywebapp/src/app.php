@@ -40,10 +40,10 @@ try {
 
 date_default_timezone_set("Europe/Oslo");
 
-$app->hash = new Hash();
 $app->userRepository = new UserRepository($app->db);
 $app->postRepository = new PostRepository($app->db);
 $app->commentRepository = new CommentRepository($app->db);
+$app->hash = new Hash($app->userRepository);
 $app->auth = new Auth($app->userRepository, $app->hash);
 
 $ns ='tdt4237\\webapp\\controllers\\';

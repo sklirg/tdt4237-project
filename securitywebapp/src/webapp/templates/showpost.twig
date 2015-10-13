@@ -11,7 +11,7 @@
         {% for comment in comments %}
             <div class="review">
                 <b>Author:</b> {{ comment.author }} <b> posted on: {{ comment.date }} </b>
-                <pre> {{ comment.text|raw }}</pre>
+                <pre> {{ comment.text}}</pre>
             </div>
         {% else %}
             <br>

@@ -32,16 +32,22 @@ class UserController extends Controller
         $request  = $this->app->request;
         $username = $request->post('user');
         $password = $request->post('pass');
+        $retypePass = $request->post('retypepass');
         $fullname = $request->post('fullname');
         $address = $request->post('address');
         $postcode = $request->post('postcode');
 
+        
 
-        $validation = new RegistrationFormValidation($username, $password, $fullname, $address, $postcode);
+        if ($this->userRepository->findByUser($username)) {
+            $username = '-1';
+        }
+
+        $validation = new RegistrationFormValidation($username, $password, $retypePass, $fullname, $address, $postcode);
 
         if ($validation->isGoodToGo()) {
             $password = $password;
-            $password = $this->hash->make($password);
+            $password = $this->hash->createAPIHash($password);
             $user = new User($username, $password, $fullname, $address, $postcode);
             $this->userRepository->save($user);
 
@@ -64,7 +70,7 @@ class UserController extends Controller
     public function logout()
     {
         $this->auth->logout();
-        $this->app->redirect('http://google.com');
+        $this->app->redirect('/');
     }
 
     public function show($username)

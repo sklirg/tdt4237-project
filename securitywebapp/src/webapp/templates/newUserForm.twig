@@ -7,12 +7,16 @@
 <b>{{ flash.info}}</b> <br />
 <b>{{ flash.error }}</b> <br />
 
+<p id="errormsg"></p>
+
 <form action="" method="POST">
 
     <label>Username: </label>
     <input type="text" name="user" value="{{ username }}"> <br />
     <label>Password: </label>
-    <input type="text" name="pass"> <br />
+    <input type="password" name="pass"> <br />
+    <label>Retype Password: </label>
+    <input type="password" name="retypepass"> <br />
     <label>Full Name (Will not be visible for other users)</label>
     <input type="text" name = "fullname"><br/>
     <label>Address (Will not be visible for other users)</label>
@@ -20,6 +24,14 @@
     <label> Postcode (Only four digits please)</label>
     <input type = "text" name = "postcode"><br/>
     <input type="submit" name="submit" value="Create new user"> <br/>
+
+    <?php
+if(isset($error) && !empty($error)){
+    ?>
+    <span class="error"><?= $error; ?></span>
+    <?php
+}
+?>
 
 </form>
 {% endblock %}

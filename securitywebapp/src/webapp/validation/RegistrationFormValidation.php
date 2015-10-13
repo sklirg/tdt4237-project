@@ -12,9 +12,9 @@ class RegistrationFormValidation
     
     private $validationErrors = [];
     
-    public function __construct($username, $password, $fullname, $address, $postcode)
+    public function __construct($username, $password, $retypePass, $fullname, $address, $postcode)
     {
-        return $this->validate($username, $password, $fullname, $address, $postcode);
+        return $this->validate($username, $password, $retypePass, $fullname, $address, $postcode);
     }
     
     public function isGoodToGo()
@@ -27,10 +27,14 @@ class RegistrationFormValidation
         return $this->validationErrors;
     }
 
-    private function validate($username, $password, $fullname, $address, $postcode)
+    private function validate($username, $password, $retypePass, $fullname, $address, $postcode)
     {
         if (empty($password)) {
             $this->validationErrors[] = 'Password cannot be empty';
+        }
+
+        if ($password != $retypePass) {
+            $this->validationErrors[] = 'Passwords do not match';
         }
 
         if(empty($fullname)) {

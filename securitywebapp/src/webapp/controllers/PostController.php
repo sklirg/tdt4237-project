@@ -85,17 +85,17 @@ class PostController extends Controller
 
     public function create()
     {
-        if ($this->auth->guest()) {
+        if (!$this->auth->check()) {
             $this->app->flash("info", "You must be logged on to create a post");
             $this->app->redirect("/login");
         } else {
             $request = $this->app->request;
             $title = $request->post('title');
             $content = $request->post('content');
-            $author = $request->post('author');
+            $author = $_SESSION['user'];
             $date = date("dmY");
 
-            $validation = new PostValidation($title, $author, $content);
+            $validation = new PostValidation($author, $title, $content);
             if ($validation->isGoodToGo()) {
                 $post = new Post();
                 $post->setAuthor($author);
@@ -103,14 +103,12 @@ class PostController extends Controller
                 $post->setContent($content);
                 $post->setDate($date);
                 $savedPost = $this->postRepository->save($post);
-                $this->app->redirect('/posts/' . $savedPost . '?msg="Post succesfully posted');
+                $this->app->redirect('/posts/' . $savedPost . '?msg=Post successfully posted');
+            } else {
+                $this->app->flashNow('error', join('<br>', $validation->getValidationErrors()));
+                $this->app->render('createpost.twig');
             }
         }
-
-            $this->app->flashNow('error', join('<br>', $validation->getValidationErrors()));
-            $this->app->render('createpost.twig');
-            // RENDER HERE
-
     }
 }
 

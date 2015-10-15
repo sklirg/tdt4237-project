@@ -9,6 +9,8 @@ class RegistrationFormValidation
 {
     const MIN_USER_LENGTH = 3;
     const MAX_USER_LENGTH = 16;
+    const MIN_PW_LENGTH = 6;
+    const MAX_PW_LENGTH = 254;
     
     private $validationErrors = [];
     
@@ -31,6 +33,17 @@ class RegistrationFormValidation
     {
         if (empty($password)) {
             $this->validationErrors[] = 'Password cannot be empty';
+        }
+        else {
+            if (strlen($password) < $this::MIN_PW_LENGTH){
+                $this->validationErrors[] = "Password is too short.";
+            } else if (strlen($password) > $this::MAX_PW_LENGTH){
+                $this->validationErrors[] = "Password is too long.";
+            }
+
+            if(preg_match('/^[A-Za-z0-9_\s]+$/', $password) === 0){
+                $this->validationErrors[] = "Password can only contain alphanumeric values";
+            }
         }
 
         if ($password != $retypePass) {

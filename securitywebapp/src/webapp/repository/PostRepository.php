@@ -93,11 +93,20 @@ class PostRepository
         $date    = $post->getDate();
 
         if ($post->getPostId() === null) {
-            $query = "INSERT INTO posts (title, author, content, date) "
-                . "VALUES ('$title', '$author', '$content', '$date')";
+            // Prepare SQL statement
+            $stmt = $this->db->prepare("INSERT INTO posts (title, author, content, date) " .
+            "VALUES (:title, :author, :content, :date)"
+            );
+            // Bind parameters to their respective values
+            $stmt->bindParam(":title", $title);
+            $stmt->bindParam(":author", $author);
+            $stmt->bindParam(":content", $content);
+            $stmt->bindParam(":date", $date);
+            // Execute query
+            $stmt->execute();
         }
 
-        $this->db->exec($query);
+        // Seems like good practice....
         return $this->db->lastInsertId();
     }
 }

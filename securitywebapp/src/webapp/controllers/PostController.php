@@ -18,6 +18,11 @@ class PostController extends Controller
 
     public function index()
     {
+
+        if ($this->auth->guest()) {
+            $this->app->flash('info', "You must be logged in to view the posts page.");
+            $this->app->redirect('/');
+        }
         $posts = $this->postRepository->all();
 
         $posts->sortByDate();
@@ -26,6 +31,11 @@ class PostController extends Controller
 
     public function show($postId)
     {
+
+        if ($this->auth->guest()) {
+            $this->app->flash('info', "You must be logged in to view the posts page.");
+            $this->app->redirect('/');
+        }
         $post = $this->postRepository->find($postId);
         $comments = $this->commentRepository->findByPostId($postId);
         $request = $this->app->request;

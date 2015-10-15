@@ -94,6 +94,18 @@ class UserRepository
         );
     }
 
+    /**
+     * @param $user
+     * @return string
+     */
+    public function getIsAdmin($user)
+    {
+        $query = "SELECT isadmin FROM users WHERE user=:user";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['user'=>$user]);
+        return $statement->fetchColumn();
+    }
+
 
 
     public function all()

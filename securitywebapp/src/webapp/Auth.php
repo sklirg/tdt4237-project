@@ -19,6 +19,7 @@ class Auth
      */
     private $userRepository;
 
+
     public function __construct(UserRepository $userRepository, Hash $hash)
     {
         $this->userRepository = $userRepository;
@@ -76,7 +77,8 @@ class Auth
     public function isAdmin()
     {
         if ($this->check()) {
-            return $_COOKIE['isadmin'] === 'yes';
+            return $this->userRepository->getIsAdmin($_SESSION['user']) == 1;
+            # return $_COOKIE['isadmin'] === 'yes';
         }
 
         throw new Exception('Not logged in but called Auth::isAdmin() anyway');

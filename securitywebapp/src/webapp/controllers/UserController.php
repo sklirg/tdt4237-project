@@ -70,6 +70,10 @@ class UserController extends Controller
     public function logout()
     {
         $this->auth->logout();
+        /*
+        $this->app->deleteCookie('isadmin');
+        $this->app->deleteCookie('PHPSESSID');
+        */
         $this->app->redirect('/');
     }
 

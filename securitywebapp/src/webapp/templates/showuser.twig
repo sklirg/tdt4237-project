@@ -39,12 +39,12 @@
             <tr></tr>
         {% if isPayingUser %}
             <th>Spendings:</th>
-            <td>You have not payed shit yet Cris</td> {# {{  user.spendings }}#}
+            <td> {{  user.totalpayed }}</td>
             <tr></tr>
         {% endif %}
         {% if isDoctor %}
             <th>Earnings:</th>
-            <td>You have not answered shit yet Lisa!</td> {# {{ user.earnings }} #}
+            <td>{{ user.totalearned }}</td>
             <tr></tr>
         {% endif %}
 

@@ -132,7 +132,8 @@ class UserRepository
 
     public function all()
     {
-        $rows = $this->pdo->query(self::SELECT_ALL);
+        $q = "SELECT * FROM users";
+        $rows = $this->pdo->query($q);
         
         if ($rows === false) {
             return [];
@@ -190,6 +191,37 @@ class UserRepository
             'address'=>$user->getAddress(),
             'postcode'=>$user->getPostcode()
         ]);
+    }
+
+    public function grantStatus($username)
+    {
+        #TODO Change sql query
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE user=:username");
+        // Bind parameters to their respective values
+        $stmt->bindParam(":username", $username);
+        // Execute query
+        return $stmt->execute();
+
+    }
+    public function revokeStatus($username)
+    {
+        #TODO Change sql query
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE user=:username");
+        // Bind parameters to their respective values
+        $stmt->bindParam(":username", $username);
+        // Execute query
+        return $stmt->execute();
+    }
+
+    public function saveBankAccount()
+    {
+
+    }
+
+    public function getBankAccount()
+    {
+
     }
 
 }

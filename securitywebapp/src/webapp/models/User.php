@@ -16,6 +16,11 @@ class User
     protected $age;
     protected $bankcard;
     protected $isAdmin = 0;
+    protected $bnr = 0;
+    protected $totalpayed = 0;
+    protected $totalearned = 0;
+    protected $isdoctor;
+    protected $ispayinguser;
 
     function __construct($username, $hash, $fullname, $address, $postcode)
     {
@@ -127,6 +132,56 @@ class User
     {
         $this->isAdmin = $isAdmin;
         return $this;
+    }
+
+    public function getBnr()
+    {
+        return $this->bnr;
+    }
+
+    public function setBnr($bnr)
+    {
+        $this->bnr = $bnr;
+    }
+
+    public function getIsdoctor()
+    {
+        return $this->isdoctor;
+    }
+
+    public function setIsdoctor($isdoctor)
+    {
+        $this->isdoctor = $isdoctor;
+    }
+
+    public function getIspayinguser()
+    {
+        return $this->ispayinguser;
+    }
+
+    public function setIspayinguser($ispayinguser)
+    {
+        $this->ispayinguser = $ispayinguser;
+    }
+
+    public function getTotalpayed()
+    {
+        return $this->totalpayed;
+    }
+
+    public function setTotalpayed($totalpayed)
+    {
+        $this->totalpayed = $totalpayed;
+    }
+
+    public function getTotalearned()
+    {
+        return $this->totalearned;
+    }
+
+    public function setTotalearned($totalearned)
+    {
+        $this->totalearned = $totalearned;
     }
 
 }

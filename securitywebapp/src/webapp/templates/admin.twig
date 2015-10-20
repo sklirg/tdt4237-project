@@ -53,8 +53,8 @@
                     {#TODO Get doctor stsatus from db#}
                     <td><a href="/user/{{ user.userid}}">{{ user.userid }}</a> </td>
 
-                    <td><a href="/admin/grantDoctor/{{ user.username}}">Grant Doctor status</a></td>
-                    <td><a href="/admin/revokeDoctor/{{ user.username }}">Revoke Doctor status</a></td>
+                    <td><a href="/admin/grantDoctor/{{ user.userid}}">Grant Doctor status</a></td>
+                    <td><a href="/admin/revokeDoctor/{{ user.userid }}">Revoke Doctor status</a></td>
                 </tr>
             {% endfor %}
         </table>

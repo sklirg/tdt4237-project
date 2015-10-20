@@ -33,6 +33,10 @@ class AdminController extends Controller
 
     public function delete($username)
     {
+        $file = "debug.txt";
+
+
+        file_put_contents($file, "test 1".PHP_EOL, FILE_APPEND | LOCK_EX);
         if ($this->auth->guest()) {
             $this->app->flash('info', "You must be logged in to view the admin page.");
             $this->app->redirect('/');
@@ -42,8 +46,9 @@ class AdminController extends Controller
             $this->app->flash('info', "You must be administrator to view the admin page.");
             $this->app->redirect('/');
         }
-
-        if ($this->userRepository->deleteByUsername($username) === 1) {
+        $a = $this->userRepository->deleteByUsername($username);
+        file_put_contents($file, $a, FILE_APPEND | LOCK_EX);
+        if ($a == 1) {
             $this->app->flash('info', "Sucessfully deleted '$username'");
             $this->app->redirect('/admin');
             return;
@@ -86,7 +91,7 @@ class AdminController extends Controller
             $this->app->redirect('/');
         }
 
-        if ($this->userRepository->grantStatus($username) === 1) {
+        if ($this->userRepository->grantStatus($username) == 1) {
             $this->app->flash('info', "Status granted to '$username'");
             $this->app->redirect('/admin');
             return;
@@ -107,7 +112,7 @@ class AdminController extends Controller
             $this->app->redirect('/');
         }
 
-        if ($this->userRepository->revokeStatus($username) === 1) {
+        if ($this->userRepository->revokeStatus($username) == 1) {
             $this->app->flash('info', "Status revoked from '$username'");
             $this->app->redirect('/admin');
             return;

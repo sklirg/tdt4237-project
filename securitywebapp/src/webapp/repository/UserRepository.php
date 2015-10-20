@@ -113,6 +113,7 @@ class UserRepository
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
+
         return $stmt->execute();
     }
 
@@ -194,35 +195,22 @@ class UserRepository
         ]);
     }
 
-    public function grantStatus($username)
+    public function grantStatus($userid)
     {
-        #TODO Change sql query
-        $stmt = $this->pdo->prepare("DELETE FROM users WHERE user=:username");
-        // Bind parameters to their respective values
-        $stmt->bindParam(":username", $username);
-        // Execute query
-        return $stmt->execute();
-
-    }
-    public function revokeStatus($username)
-    {
-        #TODO Change sql query
+        if
+        $q = "INSERT INTO doctors (id, totalearned) " . "VALUES(:id, :totalearned)";
         // Prepare SQL statement
-        $stmt = $this->pdo->prepare("DELETE FROM users WHERE user=:username");
-        // Bind parameters to their respective values
-        $stmt->bindParam(":username", $username);
+        $stmt = $this->pdo->prepare($q);
         // Execute query
-        return $stmt->execute();
-    }
+        return $stmt->execute(["id"=> $userid, "totalearned"=>0]);
 
-    public function saveBankAccount()
+    }
+    public function revokeStatus($userid)
     {
-
+        $q = "DELETE FROM doctors WHERE id=:id";
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare($q);
+        // Execute query
+        return $stmt->execute(["id" => $userid]);
     }
-
-    public function getBankAccount()
-    {
-
-    }
-
 }

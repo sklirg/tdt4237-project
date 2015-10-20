@@ -36,6 +36,7 @@ class Sql
         self::insertPosts();
         self::insertComments();
         self::insertPayingUser();
+        self::insertDummyDoctor();
     }
 
     static function insertDummyUsers()
@@ -43,14 +44,17 @@ class Sql
         $hash1 = Hash::createAPIHash(bin2hex(openssl_random_pseudo_bytes(2)));
         $hash2 = Hash::createAPIHash('bobdylan');
         $hash3 = Hash::createAPIHash('liverpool');
+        $hash4 = Hash::createAPIHash('tardis');
 
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
         $q2 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
         $q3 = "INSERT INTO users(id, user, pass, isadmin, fullname, address, postcode) VALUES (99, 'bjarni', '$hash3', 1, 'Bjarni Torgmund', 'Hummerdale 12', '4120')";
+        $q4 = "INSERT INTO users(id, user, pass, isadmin, fullname, address, postcode) VALUES (1001, 'drwho', '$hash4', 0, 'The Doctor', 'Gallifrey', '4242');";
 
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         self::$pdo->exec($q3);
+        self::$pdo->exec($q4);
 
 
         print "[tdt4237] Done inserting dummy users.".PHP_EOL;
@@ -77,18 +81,21 @@ class Sql
 
     static function insertPayingUser()
     {
-        /*
-        echo 'yey';
-        $row = self::$pdo->exec("SELECT * FROM users WHERE user='bjarni';");
-        $userid = $row['id'];
-        echo $userid;
-        */
-
         $userid = 99;
         $banr = '1020304050607080';
 
-        $q1 = "INSERT INTO payingusers (id, banr) VALUES ('$userid', '$banr');";
+        $q1 = "INSERT INTO payingusers (id, banr, totalpayed) VALUES ('$userid', '$banr', 0);";
         self::$pdo->exec($q1);
+        print "[tdt4237] Done inserting paying user.".PHP_EOL;
+    }
+
+    static function insertDummyDoctor()
+    {
+        $userid = 1001;
+
+        $q1 = "INSERT INTO doctors (id, totalearned) VALUES ('$userid', 0);";
+        self::$pdo->exec($q1);
+        print "[tdt4237] Done inserting dummy doctor.".PHP_EOL;
     }
 
     static function down()

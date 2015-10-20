@@ -132,12 +132,13 @@ class UserRepository
 
     public function all()
     {
-        $rows = $this->pdo->query(self::SELECT_ALL);
-        
+        $rows = $this->pdo->query("SELECT * FROM users");
+
         if ($rows === false) {
             return [];
             throw new \Exception('PDO error in all()');
         }
+
 
         return array_map([$this, 'makeUserFromRow'], $rows->fetchAll());
     }

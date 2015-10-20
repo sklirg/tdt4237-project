@@ -22,6 +22,7 @@
         <h2>Post your comment here</h2><br />
         <p>Comment: </p>
         <form method="post" action="">
+            <input type="text" name="csrf_token" value="{{ csrf_token }}" hidden="true">
             <textarea cols="40" rows="10" name="text" ></textarea> <br />
             <input type="submit" value="Submit comment" name="submit"></button>
         </form>

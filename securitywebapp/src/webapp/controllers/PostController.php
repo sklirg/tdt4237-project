@@ -31,7 +31,7 @@ class PostController extends Controller
 
     public function show($postId)
     {
-
+        $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
         if ($this->auth->guest()) {
             $this->app->flash('info', "You must be logged in to view the posts page.");
             $this->app->redirect('/');
@@ -54,6 +54,7 @@ class PostController extends Controller
         $this->render('showpost.twig', [
             'post' => $post,
             'comments' => $comments,
+            'csrf_token' => $_SESSION['csrf_token'],
             'flash' => $variables
         ]);
 
@@ -63,7 +64,10 @@ class PostController extends Controller
     {
 
         if(!$this->auth->guest()) {
-
+            if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+                $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
+                $this->app->redirect('/posts/' . $postId);
+            }
             $comment = new Comment();
             $comment->setAuthor($_SESSION['user']);
             $comment->setText($this->app->request->post("text"));
@@ -84,7 +88,9 @@ class PostController extends Controller
 
         if ($this->auth->check()) {
             $username = $_SESSION['user'];
-            $this->render('createpost.twig', ['username' => $username]);
+            // $data['csrf_token'] = md5(uniqid(rand(), true));
+            $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
+            $this->render('createpost.twig', ['username' => $username, 'csrf_token' => $_SESSION['csrf_token']]);
         } else {
 
             $this->app->flash('error', "You need to be logged in to create a post");
@@ -99,6 +105,10 @@ class PostController extends Controller
             $this->app->flash("info", "You must be logged on to create a post");
             $this->app->redirect("/login");
         } else {
+            if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+                $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
+                $this->app->redirect("/posts/new");
+            }
             $request = $this->app->request;
             $title = $request->post('title');
             $content = $request->post('content');

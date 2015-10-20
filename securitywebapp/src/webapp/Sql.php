@@ -21,7 +21,7 @@ class Sql
         $q1 = "CREATE TABLE users (id INTEGER PRIMARY KEY, user VARCHAR(50), pass VARCHAR(255), email varchar(50) default null, fullname varchar(50), address varchar(50), postcode varchar (4), age varchar(50), bio varhar(50), isadmin INTEGER);";
         $q6 = "CREATE TABLE posts (postId INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, title TEXT NOT NULL, content TEXT NOT NULL, date TEXT NOT NULL, FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(commentId INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, author TEXT NOT NULL, text INTEGER NOT NULL, belongs_to_post INTEGER NOT NULL, FOREIGN KEY(belongs_to_post) REFERENCES posts(postId));";
-        $q8 = "CREATE TABLE payingusers(id INTEGER PRIMARY KEY, banr VARCHAR(16), totalpayed INTEGER);";
+        $q8 = "CREATE TABLE payingusers(id INTEGER PRIMARY KEY, banr VARCHAR(16), ispaying INTEGER, totalpayed INTEGER);";
         $q9 = "CREATE TABLE doctors(id INTEGER PRIMARY KEY, totalearned INTEGER);";
 
         self::$pdo->exec($q1);
@@ -84,7 +84,7 @@ class Sql
         $userid = 99;
         $banr = '1020304050607080';
 
-        $q1 = "INSERT INTO payingusers (id, banr, totalpayed) VALUES ('$userid', '$banr', 0);";
+        $q1 = "INSERT INTO payingusers (id, banr, ispaying, totalpayed) VALUES ('$userid', '$banr', 0, 0);";
         self::$pdo->exec($q1);
         print "[tdt4237] Done inserting paying user.".PHP_EOL;
     }

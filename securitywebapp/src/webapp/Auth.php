@@ -60,6 +60,29 @@ class Auth
     }
 
     /**
+     * Check if the person is a doctor
+     */
+
+    public function doctor()
+    {
+        if ($this->check()) {
+            echo $this->userRepository->getIsDoctor($_SESSION['user']);
+            return $this->userRepository->getIsDoctor($_SESSION['user']) == 1;
+        }
+    }
+
+    /**
+     * Check if the person is a paying user
+     */
+
+    public function payinguser()
+    {
+        if ($this->check()) {
+            return $this->userRepository->getIsPaying($_SESSION['user']) == 1;
+        }
+    }
+
+    /**
      * Get currently logged in user.
      */
     public function user()

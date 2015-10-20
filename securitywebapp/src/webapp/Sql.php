@@ -21,10 +21,12 @@ class Sql
         $q1 = "CREATE TABLE users (id INTEGER PRIMARY KEY, user VARCHAR(50), pass VARCHAR(255), email varchar(50) default null, fullname varchar(50), address varchar(50), postcode varchar (4), age varchar(50), bio varhar(50), isadmin INTEGER);";
         $q6 = "CREATE TABLE posts (postId INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, title TEXT NOT NULL, content TEXT NOT NULL, date TEXT NOT NULL, FOREIGN KEY(author) REFERENCES users(user));";
         $q7 = "CREATE TABLE comments(commentId INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, author TEXT NOT NULL, text INTEGER NOT NULL, belongs_to_post INTEGER NOT NULL, FOREIGN KEY(belongs_to_post) REFERENCES posts(postId));";
+        $q8 = "CREATE TABLE payingusers(id INTEGER PRIMARY KEY, banr VARCHAR(16), totalpayed INTEGER);";
 
         self::$pdo->exec($q1);
         self::$pdo->exec($q6);
         self::$pdo->exec($q7);
+        self::$pdo->exec($q8);
 
         print "[tdt4237] Done creating all SQL tables.".PHP_EOL;
 
@@ -75,12 +77,14 @@ class Sql
         $q1 = "DROP TABLE users";
         $q4 = "DROP TABLE posts";
         $q5 = "DROP TABLE comments";
+        $q6 = "DROP TABLE payingusers";
 
 
 
         self::$pdo->exec($q1);
         self::$pdo->exec($q4);
         self::$pdo->exec($q5);
+        self::$pdo->exec($q6);
 
         print "[tdt4237] Done deleting all SQL tables.".PHP_EOL;
     }

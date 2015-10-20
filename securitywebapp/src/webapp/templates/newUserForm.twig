@@ -10,6 +10,7 @@
 <p id="errormsg"></p>
 
 <form action="" method="POST">
+    <input type="text" name="csrf_token" value="{{ csrf_token }}" hidden="true">
 
     <label>Username: </label>
     <input type="text" name="user" value="{{ username }}"> <br />

@@ -19,7 +19,8 @@ class UserController extends Controller
     public function index()
     {
         if ($this->auth->guest()) {
-            return $this->render('newUserForm.twig', []);
+            $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
+            return $this->render('newUserForm.twig', ['csrf_token' => $_SESSION['csrf_token']]);
         }
 
         $username = $this->auth->user()->getUserName();
@@ -43,6 +44,13 @@ class UserController extends Controller
             $username = '-1';
         }
 
+        if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
+            $this->app->redirect('/user/new');
+            return;
+        }
+
+
         $validation = new RegistrationFormValidation($username, $password, $retypePass, $fullname, $address, $postcode);
 
         if ($validation->isGoodToGo()) {
@@ -57,7 +65,7 @@ class UserController extends Controller
 
         $errors = join("<br>\n", $validation->getValidationErrors());
         $this->app->flashNow('error', $errors);
-        $this->render('newUserForm.twig', ['username' => $username]);
+        $this->render('newUserForm.twig', ['username' => $username,]);
     }
 
     public function all()
@@ -105,9 +113,11 @@ class UserController extends Controller
     public function showUserEditForm()
     {
         $this->makeSureUserIsAuthenticated();
+        $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
 
         $this->render('edituser.twig', [
-            'user' => $this->auth->user()
+            'user' => $this->auth->user(),
+            'csrf_token' => $_SESSION['csrf_token'],
         ]);
     }
 
@@ -123,6 +133,12 @@ class UserController extends Controller
         $fullname = $request->post('fullname');
         $address = $request->post('address');
         $postcode = $request->post('postcode');
+
+        if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
+            $this->app->redirect('/user/edit');
+            return;
+        }
 
         $validation = new EditUserFormValidation($email, $bio, $age);
 

@@ -21,7 +21,8 @@ class LoginController extends Controller
             return;
         }
 
-        $this->render('login.twig', []);
+        $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
+        $this->render('login.twig', ['csrf_token' => $_SESSION['csrf_token'],]);
     }
 
     public function login()
@@ -29,6 +30,11 @@ class LoginController extends Controller
         $request = $this->app->request;
         $user    = $request->post('user');
         $pass    = $request->post('pass');
+
+        if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
+            $this->app->redirect('/login');
+        }
 
         if ($this->auth->checkCredentials($user, $pass)) {
             if(!isset($_SESSION)){

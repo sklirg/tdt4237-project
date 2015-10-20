@@ -90,8 +90,36 @@ class UserRepository
             return $this->makeUserFromRow($row);
         }
 
-
     }
+
+    public function getIsPaying($user)
+    {
+        $query = "SELECT ispaying
+                  FROM payingusers
+                  INNER JOIN users
+                  ON users.id = payingusers.id
+                  WHERE user=:user";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['user'=>$user]);
+        return $statement->fetchColumn();
+    }
+
+    public function getIsDoctor($user)
+    {
+        $query = "SELECT CASE WHEN EXISTS (
+                  SELECT *
+                  FROM doctors
+                  INNER JOIN users
+                  ON users.id = doctors.id
+                  WHERE  user=:user
+                  )
+                  THEN CAST(1 AS BIT)
+                  ELSE CAST(0 AS BIT) END";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['user'=>$user]);
+        return $statement->fetchColumn();
+    }
+
     public function setHash($hash, $username)
     {
         $query = "UPDATE users SET pass=:password WHERE user=:user";

@@ -84,7 +84,7 @@ class Sql
         $userid = 99;
         $banr = '1020304050607080';
 
-        $q1 = "INSERT INTO payingusers (id, banr, ispaying, totalpayed) VALUES ('$userid', '$banr', 0, 0);";
+        $q1 = "INSERT INTO payingusers (id, banr, ispaying, totalpayed) VALUES ('$userid', '$banr', 1, 0);";
         self::$pdo->exec($q1);
         print "[tdt4237] Done inserting paying user.".PHP_EOL;
     }

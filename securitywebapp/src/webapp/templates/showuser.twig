@@ -37,6 +37,17 @@
             <th>Age:</th>
             <td>{{ user.age }}</td>
             <tr></tr>
+        {% if isPayingUser %}
+            <th>Spendings:</th>
+            <td>You have not payed shit yet Cris</td> {# {{  user.spendings }}#}
+            <tr></tr>
+        {% endif %}
+        {% if isDoctor %}
+            <th>Earnings:</th>
+            <td>You have not answered shit yet Lisa!</td> {# {{ user.earnings }} #}
+            <tr></tr>
+        {% endif %}
+
     </table>
 {% else %}
     Could not find a user with username "{{ username}}".

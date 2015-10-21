@@ -143,6 +143,8 @@ class UserController extends Controller
         $validation = new EditUserFormValidation($email, $bio, $age);
 
         if ($validation->isGoodToGo()) {
+            $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
+
             $user->setEmail(new Email($email));
             $user->setBio($bio);
             $user->setAge(new Age($age));
@@ -152,7 +154,7 @@ class UserController extends Controller
             $this->userRepository->save($user);
 
             $this->app->flashNow('info', 'Your profile was successfully saved.');
-            return $this->render('edituser.twig', ['user' => $user]);
+            return $this->render('edituser.twig', ['user' => $user, 'csrf_token' => $_SESSION['csrf_token']]);
         }
 
         $this->app->flashNow('error', join('<br>', $validation->getValidationErrors()));

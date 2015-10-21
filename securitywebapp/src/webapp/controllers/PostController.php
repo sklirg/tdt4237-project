@@ -23,10 +23,22 @@ class PostController extends Controller
             $this->app->flash('info', "You must be logged in to view the posts page.");
             $this->app->redirect('/');
         }
-        $posts = $this->postRepository->all();
+       
+        else{
 
-        $posts->sortByDate();
-        $this->render('posts.twig', ['posts' => $posts]);
+             if ($this->auth->doctor()) {
+                $posts = $this->postRepository->allDoctor();
+
+                }
+                else{
+                    $posts = $this->postRepository->all();
+                }
+                
+            }
+
+            $this->render('posts.twig', ['posts' => $posts]);
+        
+
     }
 
     public function show($postId)
@@ -47,7 +59,7 @@ class PostController extends Controller
         }
 
         $doctors = [];
-
+        
         foreach ($comments as $comment)
         {
             $author = $comment->getAuthor();

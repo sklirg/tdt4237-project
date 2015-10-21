@@ -133,6 +133,9 @@ class UserController extends Controller
         $fullname = $request->post('fullname');
         $address = $request->post('address');
         $postcode = $request->post('postcode');
+        $ispayinguser = $request->post('ispayinguser');
+        $bnr = $request->post('bnr');
+
 
         if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
@@ -149,14 +152,20 @@ class UserController extends Controller
             $user->setFullname($fullname);
             $user->setAddress($address);
             $user->setPostcode($postcode);
+            $user->setIspayinguser($ispayinguser);
+            $user->setBnr($bnr);
             $this->userRepository->save($user);
 
+
             $this->app->flashNow('info', 'Your profile was successfully saved.');
+            
             return $this->render('edituser.twig', ['user' => $user]);
+
         }
 
         $this->app->flashNow('error', join('<br>', $validation->getValidationErrors()));
         $this->render('edituser.twig', ['user' => $user]);
+
     }
 
     public function makeSureUserIsAuthenticated()

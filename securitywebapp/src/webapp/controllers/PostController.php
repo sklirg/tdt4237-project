@@ -42,20 +42,27 @@ class PostController extends Controller
         $message = $request->get('msg');
         $variables = [];
 
-
         if($message) {
             $variables['msg'] = $message;
-
         }
 
+        $doctors = [];
 
-
+        foreach ($comments as $comment)
+        {
+            $author = $comment->getAuthor();
+            if ($this->userRepository->getIsDoctor($author) == 1)
+            {
+                $doctors[] = $author;
+            }
+        }
 
         $this->render('showpost.twig', [
             'post' => $post,
             'comments' => $comments,
             'csrf_token' => $_SESSION['csrf_token'],
-            'flash' => $variables
+            'flash' => $variables,
+            'doctors' => $doctors
         ]);
 
     }

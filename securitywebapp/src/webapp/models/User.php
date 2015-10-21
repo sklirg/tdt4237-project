@@ -142,6 +142,7 @@ class User
     public function setBnr($bnr)
     {
         $this->bnr = $bnr;
+        return $this;
     }
 
     public function getIsdoctor()
@@ -152,6 +153,7 @@ class User
     public function setIsdoctor($isdoctor)
     {
         $this->isdoctor = $isdoctor;
+        return $this;
     }
 
     public function getIspayinguser()
@@ -162,6 +164,7 @@ class User
     public function setIspayinguser($ispayinguser)
     {
         $this->ispayinguser = $ispayinguser;
+        return $this;
     }
 
     public function getTotalpayed()
@@ -172,6 +175,7 @@ class User
     public function setTotalpayed($totalpayed)
     {
         $this->totalpayed = $totalpayed;
+        return $this;
     }
 
     public function getTotalearned()
@@ -182,6 +186,7 @@ class User
     public function setTotalearned($totalearned)
     {
         $this->totalearned = $totalearned;
+        return $this;
     }
 
 }

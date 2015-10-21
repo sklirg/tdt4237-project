@@ -173,10 +173,15 @@ class UserRepository
 
     public function save(User $user)
     {
+        echo "TORSTEIN";
+        echo $user->getUserId();
+        echo $user->getUsername();
         if ($user->getUserId() === null) {
             return $this->saveNewUser($user);
+            echo "NEW USER";
         }
 
+        echo "EXISITNG USER";
         $this->saveExistingUser($user);
     }
 
@@ -204,6 +209,7 @@ class UserRepository
 
     public function saveExistingUser(User $user)
     {
+
         // Prepare statement
         $stmt = $this->pdo->prepare("UPDATE users " .
             "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
@@ -219,6 +225,25 @@ class UserRepository
             'address'=>$user->getAddress(),
             'postcode'=>$user->getPostcode()
         ]);
+
+        if ($user->getIsdoctor()){
+            $stmt2 = $this->pdo->prepare("UPDATE doctors".
+                "SET totalearned=:totalearned WHERE id=:userid"
+            );
+            $stmt2->execute(['totalearned'=>$user->getTotalearned()]);
+        }
+
+        if ($user->getIspayinguser()) {
+            $stmt3 = $this->pdo->prepare("UPDATE payingusers".
+                "SET  banr=:bnr, isPaying=:isPaying, totalPayed=:totalPayed WHERE id=:userid"
+            );
+            $stmt3->execute([
+                'banr'=>$user->getBnr(),
+                'isPaying'=>$user->getIspayinguser(),
+                'totalPayed'=>$user->getTotalpayed()
+                ]);
+        }
+
     }
 
 }

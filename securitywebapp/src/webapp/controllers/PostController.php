@@ -6,6 +6,7 @@ use tdt4237\webapp\models\Post;
 use tdt4237\webapp\controllers\UserController;
 use tdt4237\webapp\models\Comment;
 use tdt4237\webapp\validation\PostValidation;
+use tdt4237\webapp\models\users;
 
 class PostController extends Controller
 {
@@ -62,7 +63,23 @@ class PostController extends Controller
 
     public function addComment($postId)
     {
-
+        if ($this->postRepository->checkAnsweredByDoctor($postId) == 0) {
+            if($this->auth->doctor()) {
+                //Add 10$ to doctor's wallet
+                $user = $this->auth->user();
+                $user->setTotalEarned($user->getTotalEarned()+10);
+                $this->userRepository->save($user);
+                //Add 10$ to the post-author spent.
+                $authorName = $this->postRepository->find($postId)->getAuthor();
+                $author = $this->userRepository->findByUser($authorName);
+                $author->setTotalpayed($author->getTotalPayed()+10);
+                $this->userRepository->save($author);
+                //Set doctoranswered flag.
+                $post = $this->postRepository->find($postId);
+                $post->setIsAnsweredByDoctor(1);
+                $this->postRepository->saveExistingPost($post);
+            }
+        }
         if(!$this->auth->guest()) {
             if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
                 $this->app->flash("info", "Something went wrong. Please reload the page and try again.");

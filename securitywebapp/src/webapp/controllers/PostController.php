@@ -159,11 +159,10 @@ class PostController extends Controller
 
             $validation = new PostValidation($author, $title, $content);
             if ($validation->isGoodToGo()) {
-                $currentUser = $this->userRepository->findByUser($author);
-                echo $currentUser->getUsername();
-                if ($currentUser->getIsPayinguser()){
+                $currentUser = $this->auth->user();
+                if ($this->userRepository->getIsPaying($author) == 1){
                     //Pay $3 for doctorvisibility
-                    $this->userRepository->saveSpendings($author, 3);
+                    $this->userRepository->saveSpendings($currentUser, 3);
                 }
                 $post = new Post();
                 $post->setAuthor($author);

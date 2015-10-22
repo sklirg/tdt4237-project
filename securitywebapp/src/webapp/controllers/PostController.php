@@ -24,17 +24,18 @@ class PostController extends Controller
             $this->app->redirect('/');
         }
        
-        else{
+        else {
 
              if ($this->auth->doctor()) {
                 $posts = $this->postRepository->allDoctor();
 
-                }
-                else{
-                    $posts = $this->postRepository->all();
-                }
+             }
+
+             else {
+                $posts = $this->postRepository->all();
+             }
                 
-            }
+        }
 
             $this->render('posts.twig', ['posts' => $posts]);
         
@@ -54,18 +55,27 @@ class PostController extends Controller
         $message = $request->get('msg');
         $variables = [];
 
-
         if($message) {
             $variables['msg'] = $message;
-
         }
 
+        $doctors = [];
+
+        foreach ($comments as $comment)
+        {
+            $author = $comment->getAuthor();
+            if ($this->userRepository->getIsDoctor($author) == 1)
+            {
+                $doctors[] = $author;
+            }
+        }
 
         $this->render('showpost.twig', [
             'post' => $post,
             'comments' => $comments,
             'csrf_token' => $_SESSION['csrf_token'],
-            'flash' => $variables
+            'flash' => $variables,
+            'doctors' => $doctors
         ]);
 
     }
@@ -84,7 +94,7 @@ class PostController extends Controller
                 $this->userRepository->saveSpendings($author, 7);
                 //Set doctoranswered flag.
                 $post = $this->postRepository->find($postId);
-                $post->setIsAnsweredByDoctor(1);
+                $post->setDoctor(1);
                 $this->postRepository->saveExistingPost($post);
             }
         }
@@ -93,6 +103,13 @@ class PostController extends Controller
                 $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
                 $this->app->redirect('/posts/' . $postId);
             }
+
+            $isDoctor = $this->userRepository->getIsDoctor($_SESSION['user']);
+
+            if ($isDoctor == 1) {
+                $this->postRepository->updateDoctor($postId, 1);
+            }
+
             $comment = new Comment();
             $comment->setAuthor($_SESSION['user']);
             $comment->setText($this->app->request->post("text"));
@@ -153,6 +170,7 @@ class PostController extends Controller
                 $post->setTitle($title);
                 $post->setContent($content);
                 $post->setDate($date);
+                $post->setDoctor(0);
                 $savedPost = $this->postRepository->save($post);
                 $this->app->redirect('/posts/' . $savedPost . '?msg=Post successfully posted');
             } else {

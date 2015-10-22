@@ -70,3 +70,7 @@ label {
     border: 1px solid gray;
     margin: 10px;
 }
+
+#answered {
+    color: #2ca02c;
+}

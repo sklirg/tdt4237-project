@@ -225,13 +225,12 @@ class UserRepository
 
     public function grantStatus($userid)
     {
-        if
-        $q = "INSERT INTO doctors (id, totalearned) " . "VALUES(:id, :totalearned)";
-        // Prepare SQL statement
-        $stmt = $this->pdo->prepare($q);
-        // Execute query
-        return $stmt->execute(["id"=> $userid, "totalearned"=>0]);
-
+        if ($this->getDoctorById($userid));
+            $q = "INSERT INTO doctors (id, totalearned) " . "VALUES(:id, :totalearned)";
+            // Prepare SQL statement
+            $stmt = $this->pdo->prepare($q);
+            // Execute query
+            return $stmt->execute(["id"=> $userid, "totalearned"=>0]);
     }
     public function revokeStatus($userid)
     {
@@ -240,5 +239,16 @@ class UserRepository
         $stmt = $this->pdo->prepare($q);
         // Execute query
         return $stmt->execute(["id" => $userid]);
+    }
+
+    public function getDoctorById($id)
+    {
+        $q = "SELECT CASE WHEN EXISTS (
+              SELECT * FROM doctors WHERE id =:id)
+              THEN CAST(1 AS BIT)
+              ELSE CAST(0 AS BIT) END";
+        $statment = $this->pdo->prepare($q);
+        $statment->execute(["id"=>$id]);
+        return $statment->fetchColumn();
     }
 }

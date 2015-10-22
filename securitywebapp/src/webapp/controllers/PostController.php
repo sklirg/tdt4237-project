@@ -94,7 +94,7 @@ class PostController extends Controller
                 $this->userRepository->saveSpendings($author, 7);
                 //Set doctoranswered flag.
                 $post = $this->postRepository->find($postId);
-                $post->setIsAnsweredByDoctor(1);
+                $post->setDoctor(1);
                 $this->postRepository->saveExistingPost($post);
             }
         }

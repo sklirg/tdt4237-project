@@ -147,7 +147,7 @@ class PostRepository
     public function saveExistingPost(Post $post)
     {
         $postId = $post->getPostId();
-        $isAnsweredByDoctor = $post->getIsAnsweredByDoctor();
+        $isAnsweredByDoctor = $post->getDoctor();
 
         $stmt = $this->db->prepare("UPDATE posts " .
             "SET isAnsweredByDoctor=:isAnsweredByDoctor WHERE postId=:postId"

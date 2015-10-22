@@ -55,6 +55,9 @@ class UserRepository
         if (!empty($row['totalearned'])) {
             $user->setTotalearned($row['totalearned']);
         }
+        if (!empty($row['banr'])) {
+            $user->setBnr($row['banr']);
+        }
 
         return $user;
     }
@@ -73,15 +76,48 @@ class UserRepository
         return $row['fullname'];
     }
 
+    public function getIdByUsername($username)
+    {
+        $stmt = $this->pdo->prepare("SELECT id FROM USERS WHERE user=:username");
+
+        $stmt->bindParam(":username", $username);
+
+        return $stmt->execute();
+    }
+
     public function findByUser($username)
     {
         // Prepare SQL statement
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
-
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
         $stmt->execute();
+        $users = $stmt->fetch();
+
+        $stmt = $this->pdo->prepare("SELECT * FROM payingusers WHERE id=:userid");
+        $stmt->bindParam(":userid", $users['id']);
+        $stmt->execute();
+        $payingusers = $stmt->fetch();
+
+        $stmt = $this->pdo->prepare("SELECT * FROM doctors WHERE id=:userid");
+        $stmt->bindParam(":userid", $users['id']);
+        $stmt->execute();
+        $doctors = $stmt->fetch();
+
+        if ($users === false){
+            return false;
+        } elseif (!($payingusers === false)) {
+            if(!($doctors === false)){
+                return $this->makeUserFromRow($users+$payingusers+$doctors);
+            } else {
+                return $this->makeUserFromRow($users+$payingusers);
+            }
+        } elseif (!($doctors === false)) {
+                return $this->makeUserFromRow($users+$doctors);
+        } else {
+            return $this->makeUserFromRow($users);
+        }
 
         // Don't ask
         /*
@@ -93,51 +129,14 @@ class UserRepository
          * Sure. Why not.
          */
 
-        $row =[];
-        $row2 = [];
-        $row3 = [];
-
-        foreach ($stmt as $rowCurr) {
-            if($rowCurr === false){
-                break;
-            }
-            $row = $rowCurr;
-        }
-
-        $payinguser = $this->pdo->prepare("SELECT * FROM payingusers WHERE payingusers.id = :userid");
-        $payinguser->execute(['userid'=>$rowCurr['id']]);
-        foreach ($payinguser as $rowCurr) {
-            if ($rowCurr === false) {
-                break;
-            }
-            $row2 = $rowCurr;
-        }
-
-        $doctors = $this->pdo->prepare("SELECT * FROM doctors WHERE doctors.id = :userid");
-        $doctors->execute(['userid'=>$rowCurr['id']]);
-        foreach ($doctors as $rowCurr) {
-            if ($rowCurr === false) {
-                break;
-            }
-            $row3 = $rowCurr;
-        }
-        $row = $row+$row2+$row3;
-        return $this->makeUserFromRow($row);
-
         /*foreach ($stmt as $row) {
             if ($row === false) {
                 return false;
             }
-            $payinguser = $this->pdo->prepare("SELECT * FROM payingusers WHERE payingusers.id = :userid");
-            $payinguser->execute(['userid'=>$row['id']]);
-            foreach ($payinguser as $row2) {
-                if ($row2 === false) {
-                    return false;
-                }
-                $row = $row+$row2;
-                return $this->makeUserFromRow($row);
-            }
+
+            return $this->makeUserFromRow($row);
         }*/
+
     }
 
         public function setIsPaying($user)
@@ -279,165 +278,25 @@ class UserRepository
             'postcode'=>$user->getPostcode()
         ]);
     }
-    /*
-        if ($user->getIspayinguser()){
-            if($user->getIsdoctor()){
-                $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
-                UPDATE users " .
-                    "SET email=:email,
-                    age=:age,
-                    bio=:bio,
-                    isadmin=:isadmin,
-                    fullname=:fullname,
-                    address=:address,
-                    postcode=:postcode
-                    WHERE id=:userid;
 
-                UPDATE payingusers " .
-                    "SET banr=:bnr,
-                    ispaying=:ispayinguser,
-                    totalpayed=:totalpayed
-                    WHERE id=:userid;
-
-                UPDATE doctors".
-                    "SET totalearned=:totalearned
-                    WHERE id=:userid
-
-                    COMMIT;");
-                return $stmt->execute([
-                    'userid'=>$user->getUserId(),
-                    'email'=>$user->getEmail(),
-                    'age'=>$user->getAge(),
-                    'bio'=>$user->getBio(),
-                    'isadmin'=>$user->isAdmin(),
-                    'fullname'=>$user->getFullname(),
-                    'address'=>$user->getAddress(),
-                    'postcode'=>$user->getPostcode(),
-                    'banr'=>$user->getBnr(),
-                    'ispaying'=>$user->getIspayinguser(),
-                    'totalpayed'=>$user->getTotalpayed(),
-                    'totalearned'=>$user->getTotalearned()
-                ]);
-            } else {
-                $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
-                UPDATE users " .
-                    "SET email=:email,
-                    age=:age,
-                    bio=:bio,
-                    isadmin=:isadmin,
-                    fullname=:fullname,
-                    address=:address,
-                    postcode=:postcode
-                    WHERE id=:userid;
-
-                UPDATE payingusers " .
-                    "SET banr=:bnr,
-                    ispaying=:ispayinguser,
-                    totalpayed=:totalpayed
-                    WHERE id=:userid;
-
-                    COMMIT;");
-                return $stmt->execute([
-                    'userid'=>$user->getUserId(),
-                    'email'=>$user->getEmail(),
-                    'age'=>$user->getAge(),
-                    'bio'=>$user->getBio(),
-                    'isadmin'=>$user->isAdmin(),
-                    'fullname'=>$user->getFullname(),
-                    'address'=>$user->getAddress(),
-                    'postcode'=>$user->getPostcode(),
-                    'banr'=>$user->getBnr(),
-                    'ispaying'=>$user->getIspayinguser(),
-                    'totalpayed'=>$user->getTotalpayed()
-                ]);
-            }
-        } elseif ($user->getIsdoctor()){
-            $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
-                UPDATE users " .
-                "SET email=:email,
-                    age=:age,
-                    bio=:bio,
-                    isadmin=:isadmin,
-                    fullname=:fullname,
-                    address=:address,
-                    postcode=:postcode
-                    WHERE id=:userid;
-
-                UPDATE doctors".
-                "SET totalearned=:totalearned
-                    WHERE id=:userid
-
-                    COMMIT;");
-            return $stmt->execute([
-                'userid'=>$user->getUserId(),
-                'email'=>$user->getEmail(),
-                'age'=>$user->getAge(),
-                'bio'=>$user->getBio(),
-                'isadmin'=>$user->isAdmin(),
-                'fullname'=>$user->getFullname(),
-                'address'=>$user->getAddress(),
-                'postcode'=>$user->getPostcode(),
-                'totalearned'=>$user->getTotalearned()
-            ]);
-        } else {
-            // Prepare statement
-            $stmt = $this->pdo->prepare("UPDATE users " .
-                "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
-            );
-            // Execute and bind values all in one
-            return $stmt->execute([
-                'userid'=>$user->getUserId(),
-                'email'=>$user->getEmail(),
-                'age'=>$user->getAge(),
-                'bio'=>$user->getBio(),
-                'isadmin'=>$user->isAdmin(),
-                'fullname'=>$user->getFullname(),
-                'address'=>$user->getAddress(),
-                'postcode'=>$user->getPostcode()
-            ]);
-        }
-
-
-
-        /*if ($user->getIsdoctor()){
-            $stmt2 = $this->pdo->prepare("UPDATE doctors".
-                "SET totalearned=:totalearned WHERE id=:userid"
-            );
-            $stmt2->execute(['totalearned'=>$user->getTotalearned()]);
-        }
-
-        if ($user->getIspayinguser()) {
-            $stmt = $this->pdo->prepare("UPDATE payingusers " .
-            "SET id=:userid, banr=:bnr, ispaying=:ispayinguser, totalpayed=:totalpayed WHERE "
-             );
-
-            $stmt->execute([
-                'userid'=>$user->getUserId(),
-                'bnr'=>$user->getBnr(),
-                'ispayinguser'=>$user->getIspayinguser(),
-                'totalpayed'=>$user->getTotalpayed()
-            ]);
-        }
-    }*/
-
-    public function saveSpendings($user)
+    public function saveSpendings($user, $amount)
     {
-        $stmt = $this->pdo->prepare("UPDATE doctors
-                SET totalearned=:totalearned WHERE id=:userid"
+        $stmt = $this->pdo->prepare("UPDATE payingusers
+                SET totalpayed= totalpayed + :totalpayed WHERE id=:userid"
             );
-        return $stmt->execute(['totalearned'=>$user->getTotalEarned(),
+        return $stmt->execute(['totalpayed'=>$amount,
                         'userid'=>$user->getUserId()
         ]);
     }
 
-    public function saveEarnings($user)
+    public function saveEarnings($user, $amount)
     {
-        $stmt = $this->pdo->prepare("UPDATE payingusers
-            SET totalpayed=:totalpayed WHERE id=:userid"
+        $stmt = $this->pdo->prepare("UPDATE doctors
+            SET totalearned= totalearned + :totalearned WHERE id=:userid"
         );
 
         return $stmt->execute(['userid'=>$user->getUserID(),
-                        'totalpayed'=>$user->getTotalPayed()
+                        'totalearned'=>$amount
         ]);
     }
 

@@ -3,7 +3,6 @@
 namespace tdt4237\webapp\controllers;
 
 use tdt4237\webapp\models\Post;
-use tdt4237\webapp\controllers\UserController;
 use tdt4237\webapp\models\Comment;
 use tdt4237\webapp\validation\PostValidation;
 use tdt4237\webapp\models\users;
@@ -73,20 +72,16 @@ class PostController extends Controller
 
     public function addComment($postId)
     {
-        echo "Comment added";
         if ($this->postRepository->checkAnsweredByDoctor($postId) == 0) {
             if($this->auth->doctor()) {
-                //Add 10$ to doctor's wallet
+                //Add 7$ to doctor's wallet
                 $user = $this->auth->user();
-                echo $user->getTotalEarned();
-                $user->setTotalEarned($user->getTotalEarned()+10);
-                $this->userRepository->saveEarnings($user);
-                //Add 10$ to the post-author spent.
+                $this->userRepository->saveEarnings($user, 7);
+                //Add 7$ to the post-author spent.
                 $authorName = $this->postRepository->find($postId)->getAuthor();
                 $author = $this->userRepository->findByUser($authorName);
-                echo $author->getTotalPayed();
-                $author->setTotalpayed($author->getTotalPayed()+10);
-                $this->userRepository->saveSpendings($author);
+                //$author->setTotalpayed($author->getTotalPayed()+7);
+                $this->userRepository->saveSpendings($author, 7);
                 //Set doctoranswered flag.
                 $post = $this->postRepository->find($postId);
                 $post->setIsAnsweredByDoctor(1);
@@ -147,6 +142,12 @@ class PostController extends Controller
 
             $validation = new PostValidation($author, $title, $content);
             if ($validation->isGoodToGo()) {
+                $currentUser = $this->userRepository->findByUser($author);
+                echo $currentUser->getUsername();
+                if ($currentUser->getIsPayinguser()){
+                    //Pay $3 for doctorvisibility
+                    $this->userRepository->saveSpendings($author, 3);
+                }
                 $post = new Post();
                 $post->setAuthor($author);
                 $post->setTitle($title);

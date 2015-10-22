@@ -15,6 +15,7 @@ class Post
     protected $title;
     protected $content;
     protected $date;
+    protected $isAnsweredByDoctor;
 
 
     public function getPostId() {
@@ -63,9 +64,14 @@ class Post
         return $this->title;
     }
 
+    public function setDoctor($status) {
+        $this->isAnsweredByDoctor = $status;
+        return $this;
+    }
 
-
-
+    public function getDoctor() {
+        return $this->isAnsweredByDoctor;
+    }
 
 
 }

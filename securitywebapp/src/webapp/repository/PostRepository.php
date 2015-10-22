@@ -19,7 +19,7 @@ class PostRepository
         $this->db = $db;
     }
     
-    public static function create($id, $author, $title, $content, $date)
+    public static function create($id, $author, $title, $content, $date, $isAnsweredByDoctor)
     {
         $post = new Post;
         
@@ -28,7 +28,8 @@ class PostRepository
             ->setAuthor($author)
             ->setTitle($title)
             ->setContent($content)
-            ->setDate($date);
+            ->setDate($date)
+            ->setDoctor($isAnsweredByDoctor);
     }
 
     public function find($postId)
@@ -47,7 +48,7 @@ class PostRepository
 
     public function all()
     {
-        $sql   = "SELECT * FROM posts";
+        $sql   = "SELECT * FROM posts;";
         $results = $this->db->query($sql);
 
         if($results === false) {
@@ -65,11 +66,11 @@ class PostRepository
         );
     }
 
-        public function allDoctor()
+    public function allDoctor()
     {
 
         //$sql   = "SELECT * FROM posts INNER JOIN users post ON posts.author=users.user INNER JOIN payingusers ON post.id=payingusers.id";
-        $sql = "SELECT * FROM posts,users,payingusers WHERE posts.author = users.user AND payingusers.id = users.id AND payingusers.ispaying = 1";
+        $sql = "SELECT * FROM posts,users,payingusers WHERE posts.author = users.user AND payingusers.id = users.id AND payingusers.ispaying = 1;";
         $results = $this->db->query($sql);
 
         if($results === false) {
@@ -94,7 +95,8 @@ class PostRepository
             $row['author'],
             $row['title'],
             $row['content'],
-            $row['date']
+            $row['date'],
+            $row['isAnsweredByDoctor']
         );
 
        //  $this->db = $db;

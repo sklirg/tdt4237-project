@@ -24,17 +24,18 @@ class PostController extends Controller
             $this->app->redirect('/');
         }
        
-        else{
+        else {
 
              if ($this->auth->doctor()) {
                 $posts = $this->postRepository->allDoctor();
 
-                }
-                else{
-                    $posts = $this->postRepository->all();
-                }
+             }
+
+             else {
+                $posts = $this->postRepository->all();
+             }
                 
-            }
+        }
 
             $this->render('posts.twig', ['posts' => $posts]);
         

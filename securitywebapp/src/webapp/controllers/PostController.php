@@ -3,9 +3,9 @@
 namespace tdt4237\webapp\controllers;
 
 use tdt4237\webapp\models\Post;
-use tdt4237\webapp\controllers\UserController;
 use tdt4237\webapp\models\Comment;
 use tdt4237\webapp\validation\PostValidation;
+use tdt4237\webapp\models\users;
 
 class PostController extends Controller
 {
@@ -72,7 +72,22 @@ class PostController extends Controller
 
     public function addComment($postId)
     {
-
+        if ($this->postRepository->checkAnsweredByDoctor($postId) == 0) {
+            if($this->auth->doctor()) {
+                //Add 7$ to doctor's wallet
+                $user = $this->auth->user();
+                $this->userRepository->saveEarnings($user, 7);
+                //Add 7$ to the post-author spent.
+                $authorName = $this->postRepository->find($postId)->getAuthor();
+                $author = $this->userRepository->findByUser($authorName);
+                //$author->setTotalpayed($author->getTotalPayed()+7);
+                $this->userRepository->saveSpendings($author, 7);
+                //Set doctoranswered flag.
+                $post = $this->postRepository->find($postId);
+                $post->setIsAnsweredByDoctor(1);
+                $this->postRepository->saveExistingPost($post);
+            }
+        }
         if(!$this->auth->guest()) {
             if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
                 $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
@@ -127,6 +142,12 @@ class PostController extends Controller
 
             $validation = new PostValidation($author, $title, $content);
             if ($validation->isGoodToGo()) {
+                $currentUser = $this->userRepository->findByUser($author);
+                echo $currentUser->getUsername();
+                if ($currentUser->getIsPayinguser()){
+                    //Pay $3 for doctorvisibility
+                    $this->userRepository->saveSpendings($author, 3);
+                }
                 $post = new Post();
                 $post->setAuthor($author);
                 $post->setTitle($title);

@@ -225,9 +225,7 @@ class UserRepository
 
     public function grantStatus($userid)
     {
-        $file = "debug.txt";
         $a = $this->getDoctorById($userid);
-        file_put_contents($file, $a.PHP_EOL, FILE_APPEND | LOCK_EX);
         if ($a == 1)
         {
             return;

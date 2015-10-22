@@ -33,10 +33,6 @@ class AdminController extends Controller
 
     public function delete($username)
     {
-        $file = "debug.txt";
-
-
-        file_put_contents($file, "test 1".PHP_EOL, FILE_APPEND | LOCK_EX);
         if ($this->auth->guest()) {
             $this->app->flash('info', "You must be logged in to view the admin page.");
             $this->app->redirect('/');
@@ -47,7 +43,6 @@ class AdminController extends Controller
             $this->app->redirect('/');
         }
         $a = $this->userRepository->deleteByUsername($username);
-        file_put_contents($file, $a, FILE_APPEND | LOCK_EX);
         if ($a == 1) {
             $this->app->flash('info', "Sucessfully deleted '$username'");
             $this->app->redirect('/admin');
@@ -81,7 +76,6 @@ class AdminController extends Controller
     }
     public function grantDoctor($username)
     {
-        $file = "debug.txt";
         if ($this->auth->guest()) {
             $this->app->flash('info', "You must be logged in to view the admin page.");
             $this->app->redirect('/');

@@ -18,28 +18,27 @@ class PostRepository
     {
         $this->db = $db;
     }
-    
+
     public static function create($id, $author, $title, $content, $date, $isAnsweredByDoctor)
     {
         $post = new Post;
-        
+
         return $post
             ->setPostId($id)
             ->setAuthor($author)
             ->setTitle($title)
             ->setContent($content)
             ->setDate($date)
-            ->setIsAnsweredByDoctor($isAnsweredByDoctor);
-
+            ->setDoctor($isAnsweredByDoctor);
     }
 
     public function find($postId)
     {
-        $sql  = "SELECT * FROM posts WHERE postId = $postId";
+        $sql = "SELECT * FROM posts WHERE postId = $postId";
         $result = $this->db->query($sql);
         $row = $result->fetch();
 
-        if($row === false) {
+        if ($row === false) {
             return false;
         }
 
@@ -49,16 +48,16 @@ class PostRepository
 
     public function all()
     {
-        $sql   = "SELECT * FROM posts";
+        $sql = "SELECT * FROM posts;";
         $results = $this->db->query($sql);
 
-        if($results === false) {
+        if ($results === false) {
             return [];
             throw new \Exception('PDO error in posts all()');
         }
 
         $fetch = $results->fetchAll();
-        if(count($fetch) == 0) {
+        if (count($fetch) == 0) {
             return false;
         }
 
@@ -67,18 +66,20 @@ class PostRepository
         );
     }
 
-        public function allDoctor()
+    public function allDoctor()
     {
-        $sql = "SELECT * FROM posts,users,payingusers WHERE posts.author = users.user AND payingusers.id = users.id AND payingusers.ispaying = 1";
+        //$sql   = "SELECT * FROM posts INNER JOIN users post ON posts.author=users.user INNER JOIN payingusers ON post.id=payingusers.id";
+        $sql = "SELECT * FROM posts,users,payingusers WHERE posts.author = users.user AND payingusers.id = users.id AND payingusers.ispaying = 1;";
+
         $results = $this->db->query($sql);
 
-        if($results === false) {
+        if ($results === false) {
             return [];
             throw new \Exception('PDO error in posts all()');
         }
 
         $fetch = $results->fetchAll();
-        if(count($fetch) == 0) {
+        if (count($fetch) == 0) {
             return false;
         }
 
@@ -98,7 +99,7 @@ class PostRepository
             $row['isAnsweredByDoctor']
         );
 
-       //  $this->db = $db;
+        //  $this->db = $db;
     }
 
     public function deleteByPostid($postId)
@@ -111,23 +112,23 @@ class PostRepository
     {
         $query = "SELECT isAnsweredByDoctor FROM posts WHERE postId=:postId";
         $statement = $this->db->prepare($query);
-        $statement->execute(['postId'=>$postId]);
+        $statement->execute(['postId' => $postId]);
         return $statement->fetchColumn();
     }
 
 
     public function save(Post $post)
     {
-        $title   = $post->getTitle();
+        $title = $post->getTitle();
         $author = $post->getAuthor();
         $content = $post->getContent();
-        $date    = $post->getDate();
-        $isAnsweredByDoctor = $post->getIsAnsweredByDoctor();
+        $date = $post->getDate();
+        $isAnsweredByDoctor = $post->getDoctor();
 
         if ($post->getPostId() === null) {
             // Prepare SQL statement
             $stmt = $this->db->prepare("INSERT INTO posts (title, author, content, date, isAnsweredByDoctor) " .
-            "VALUES (:title, :author, :content, :date, :isAnsweredByDoctor)"
+                "VALUES (:title, :author, :content, :date, :isAnsweredByDoctor);"
             );
             // Bind parameters to their respective values
             $stmt->bindParam(":title", $title);
@@ -152,9 +153,16 @@ class PostRepository
             "SET isAnsweredByDoctor=:isAnsweredByDoctor WHERE postId=:postId"
         );
         $stmt->execute([
-                ':postId'=>$postId,
-                ':isAnsweredByDoctor'=>$isAnsweredByDoctor
-            ]);
+            ':postId' => $postId,
+            ':isAnsweredByDoctor' => $isAnsweredByDoctor
+        ]);
+    }
 
+    public function updateDoctor($postId, $status)
+    {
+        $stmt = $this->db->prepare("UPDATE posts SET isAnsweredByDoctor=:status WHERE postId=:postId;");
+        $stmt->bindParam(":status", $status);
+        $stmt->bindParam(":postId", $postId);
+        $stmt->execute();
     }
 }

@@ -202,6 +202,7 @@ class UserRepository
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
+
         return $stmt->execute();
     }
 
@@ -219,7 +220,7 @@ class UserRepository
     {
         $rows = $this->pdo->query("SELECT * FROM users;");
         $payinguser = $this->pdo->query("SELECT * FROM users INNER JOIN payingusers ON users.id=payingusers.id;");
-
+        
         if ($rows === false) {
             return [];
             throw new \Exception('PDO error in all()');
@@ -300,4 +301,38 @@ class UserRepository
         ]);
     }
 
+    public function grantStatus($userid)
+    {
+        $a = $this->getDoctorById($userid);
+        if ($a == 1)
+        {
+            return;
+        }
+
+        $q = "INSERT INTO doctors (id, totalearned) " . "VALUES(:id, :totalearned)";
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare($q);
+        // Execute query
+        return $stmt->execute(["id"=> $userid, "totalearned"=>0]);
+
+    }
+    public function revokeStatus($userid)
+    {
+        $q = "DELETE FROM doctors WHERE id=:id";
+        // Prepare SQL statement
+        $stmt = $this->pdo->prepare($q);
+        // Execute query
+        return $stmt->execute(["id" => $userid]);
+    }
+
+    public function getDoctorById($id)
+    {
+        $q = "SELECT CASE WHEN EXISTS(
+              SELECT * FROM doctors WHERE id =:id)
+              THEN CAST(1 AS BIT)
+              ELSE CAST(0 AS BIT) END";
+        $statment = $this->pdo->prepare($q);
+        $statment->execute(["id"=>$id]);
+        return $statment->fetchColumn();
+    }
 }

@@ -146,6 +146,8 @@ class UserController extends Controller
         $validation = new EditUserFormValidation($email, $bio, $age);
 
         if ($validation->isGoodToGo()) {
+            $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
+
             $user->setEmail(new Email($email));
             $user->setBio($bio);
             $user->setAge(new Age($age));

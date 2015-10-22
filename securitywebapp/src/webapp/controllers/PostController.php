@@ -59,7 +59,7 @@ class PostController extends Controller
         }
 
         $doctors = [];
-        
+
         foreach ($comments as $comment)
         {
             $author = $comment->getAuthor();

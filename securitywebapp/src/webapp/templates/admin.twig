@@ -39,4 +39,28 @@
     There are no posts
 {% endif %}
 
+    {% if users %}
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Status</th>
+            </tr>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.userid}}</td>
+                    <td><a href="/user/{{ user.username}}">{{ user.username}}</a></td>
+                    {#TODO Get doctor stsatus from db#}
+                    <td><a href="/user/{{ user.userid}}">{{ user.userid }}</a> </td>
+
+                    <td><a href="/admin/grantDoctor/{{ user.userid}}">Grant Doctor status</a></td>
+                    <td><a href="/admin/revokeDoctor/{{ user.userid }}">Revoke Doctor status</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        The users table is empty.
+{% endif %}
+
 {% endblock %}
+

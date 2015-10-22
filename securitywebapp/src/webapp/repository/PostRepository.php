@@ -118,7 +118,7 @@ class PostRepository
         if ($post->getPostId() === null) {
             // Prepare SQL statement
             $stmt = $this->db->prepare("INSERT INTO posts (title, author, content, date, isAnsweredByDoctor) " .
-            "VALUES (:title, :author, :content, :date, :isAnsweredByDoctor)"
+            "VALUES (:title, :author, :content, :date, :isAnsweredByDoctor);"
             );
             // Bind parameters to their respective values
             $stmt->bindParam(":title", $title);
@@ -132,5 +132,13 @@ class PostRepository
 
         // Seems like good practice....
         return $this->db->lastInsertId();
+    }
+
+    public function updateDoctor($postId, $status)
+    {
+        $stmt = $this->db->prepare("UPDATE posts SET isAnsweredByDoctor=:status WHERE postId=:postId;");
+        $stmt->bindParam(":status", $status);
+        $stmt->bindParam(":postId", $postId);
+        $stmt->execute();
     }
 }

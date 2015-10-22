@@ -81,6 +81,7 @@ class AdminController extends Controller
     }
     public function grantDoctor($username)
     {
+        $file = "debug.txt";
         if ($this->auth->guest()) {
             $this->app->flash('info', "You must be logged in to view the admin page.");
             $this->app->redirect('/');
@@ -100,6 +101,7 @@ class AdminController extends Controller
         $this->app->flash('info', "An error ocurred. Unable to grant status to '$username'.");
         $this->app->redirect('/admin');
     }
+
     public function revokeDoctor($username)
     {
         if ($this->auth->guest()) {

@@ -40,7 +40,7 @@ class UserRepository
         $user->setPostcode((($row['postcode'])));
         $user->setBio($row['bio']);
         $user->setIsAdmin($row['isadmin']);
-
+        $user->setBnr($row['banr']);
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));
         }
@@ -56,6 +56,7 @@ class UserRepository
     {
         // Prepare SQL statement
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
+
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
@@ -69,6 +70,9 @@ class UserRepository
     {
         // Prepare SQL statement
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
+
+
+
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
@@ -87,13 +91,35 @@ class UserRepository
             if ($row === false) {
                 return false;
             }
+            $payinguser = $this->pdo->prepare("SELECT * FROM payingusers WHERE payingusers.id = :userid");
+            $payinguser->execute(['userid'=>$row['id']]);
+            foreach ($payinguser as $row2) {
+            if ($row2 === false) {
+                return false;
+            }
+            $row = $row+$row2;
             return $this->makeUserFromRow($row);
         }
 
     }
+}
+
+        public function setIsPaying($user)
+    {
+        $query = "UPDATE ispaying
+                  FROM payingusers
+                  INNER JOIN users
+                  ON users.id = payingusers.id
+                  SET ispaying = 1
+                  WHERE user=:user";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute(['user'=>$user]);
+        return $statement->fetchColumn();
+    }
 
     public function getIsPaying($user)
     {
+
         $query = "SELECT ispaying
                   FROM payingusers
                   INNER JOIN users
@@ -160,15 +186,15 @@ class UserRepository
 
     public function all()
     {
-        $rows = $this->pdo->query("SELECT * FROM users");
+        $rows = $this->pdo->query("SELECT * FROM users;");
+        $payinguser = $this->pdo->query("SELECT * FROM users INNER JOIN payingusers ON users.id=payingusers.id;");
 
         if ($rows === false) {
             return [];
             throw new \Exception('PDO error in all()');
         }
 
-
-        return array_map([$this, 'makeUserFromRow'], $rows->fetchAll());
+        return array_map([$this, 'makeUserFromRow'], $rows->fetchAll()) + array_map([$this, 'makeUserFromRow'], $payinguser->fetchAll());
     }
 
     public function save(User $user)
@@ -209,7 +235,6 @@ class UserRepository
 
     public function saveExistingUser(User $user)
     {
-
         // Prepare statement
         $stmt = $this->pdo->prepare("UPDATE users " .
             "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
@@ -234,16 +259,17 @@ class UserRepository
         }
 
         if ($user->getIspayinguser()) {
-            $stmt3 = $this->pdo->prepare("UPDATE payingusers".
-                "SET  banr=:bnr, isPaying=:isPaying, totalPayed=:totalPayed WHERE id=:userid"
-            );
-            $stmt3->execute([
-                'banr'=>$user->getBnr(),
-                'isPaying'=>$user->getIspayinguser(),
-                'totalPayed'=>$user->getTotalpayed()
-                ]);
-        }
+            $stmt = $this->pdo->prepare("UPDATE payingusers " .
+            "SET id=:userid, banr=:bnr, ispaying=:ispayinguser, totalpayed=:totalpayed"
+        );
 
+        $stmt->execute([
+            'userid'=>$user->getUserId(),
+            'bnr'=>$user->getBnr(),
+            'ispayinguser'=>$user->getIspayinguser(),
+            'totalpayed'=>$user->getTotalpayed()
+        ]);
+        }
     }
 
 }

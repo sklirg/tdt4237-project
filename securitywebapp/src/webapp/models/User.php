@@ -162,9 +162,16 @@ class User
     }
 
     public function setIspayinguser($ispayinguser)
-    {
-        $this->ispayinguser = $ispayinguser;
-        return $this;
+
+    {   
+        if ($ispayinguser == 1) {
+            $this->ispayinguser = $ispayinguser;
+            return $this;
+        }
+        else{
+            $this->ispayinguser = 0;
+            return $this;
+        }
     }
 
     public function getTotalpayed()

@@ -87,6 +87,14 @@ class PostController extends Controller
                 $this->app->flash("info", "Something went wrong. Please reload the page and try again.");
                 $this->app->redirect('/posts/' . $postId);
             }
+
+            $isDoctor = $this->userRepository->getIsDoctor($_SESSION['user']);
+            if ($isDoctor == 1) {
+                $post = $this->postRepository->find($postId);
+                $post->setDoctor(1);
+                $this->postRepository->save($post);
+            }
+
             $comment = new Comment();
             $comment->setAuthor($_SESSION['user']);
             $comment->setText($this->app->request->post("text"));
@@ -141,6 +149,7 @@ class PostController extends Controller
                 $post->setTitle($title);
                 $post->setContent($content);
                 $post->setDate($date);
+                $post->setDoctor(0);
                 $savedPost = $this->postRepository->save($post);
                 $this->app->redirect('/posts/' . $savedPost . '?msg=Post successfully posted');
             } else {

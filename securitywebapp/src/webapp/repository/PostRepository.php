@@ -109,21 +109,23 @@ class PostRepository
 
     public function save(Post $post)
     {
-        $title   = $post->getTitle();
-        $author = $post->getAuthor();
-        $content = $post->getContent();
-        $date    = $post->getDate();
+        $title              = $post->getTitle();
+        $author             = $post->getAuthor();
+        $content            = $post->getContent();
+        $date               = $post->getDate();
+        $isAnsweredByDoctor = $post->getDoctor();
 
         if ($post->getPostId() === null) {
             // Prepare SQL statement
-            $stmt = $this->db->prepare("INSERT INTO posts (title, author, content, date) " .
-            "VALUES (:title, :author, :content, :date)"
+            $stmt = $this->db->prepare("INSERT INTO posts (title, author, content, date, isAnsweredByDoctor) " .
+            "VALUES (:title, :author, :content, :date, :isAnsweredByDoctor)"
             );
             // Bind parameters to their respective values
             $stmt->bindParam(":title", $title);
             $stmt->bindParam(":author", $author);
             $stmt->bindParam(":content", $content);
             $stmt->bindParam(":date", $date);
+            $stmt->bindParam(":isAnsweredByDoctor", $isAnsweredByDoctor);
             // Execute query
             $stmt->execute();
         }

@@ -89,6 +89,7 @@ class PostController extends Controller
             }
 
             $isDoctor = $this->userRepository->getIsDoctor($_SESSION['user']);
+
             if ($isDoctor == 1) {
                 $post = $this->postRepository->find($postId);
                 $post->setDoctor(1);

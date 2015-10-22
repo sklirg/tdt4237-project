@@ -40,13 +40,20 @@ class UserRepository
         $user->setPostcode((($row['postcode'])));
         $user->setBio($row['bio']);
         $user->setIsAdmin($row['isadmin']);
-        $user->setBnr($row['banr']);
         if (!empty($row['email'])) {
             $user->setEmail(new Email($row['email']));
         }
 
         if (!empty($row['age'])) {
             $user->setAge(new Age($row['age']));
+        }
+
+        if (!empty($row['totalpayed'])) {
+            $user->setTotalpayed($row['totalpayed']);
+        }
+
+        if (!empty($row['totalearned'])) {
+            $user->setTotalearned($row['totalearned']);
         }
 
         return $user;
@@ -71,8 +78,6 @@ class UserRepository
         // Prepare SQL statement
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE user=:username");
 
-
-
         // Bind parameters to their respective values
         $stmt->bindParam(":username", $username);
         // Execute query
@@ -87,22 +92,53 @@ class UserRepository
          * otherwise, create a user.
          * Sure. Why not.
          */
-        foreach ($stmt as $row) {
+
+        $row =[];
+        $row2 = [];
+        $row3 = [];
+
+        foreach ($stmt as $rowCurr) {
+            if($rowCurr === false){
+                break;
+            }
+            $row = $rowCurr;
+        }
+
+        $payinguser = $this->pdo->prepare("SELECT * FROM payingusers WHERE payingusers.id = :userid");
+        $payinguser->execute(['userid'=>$rowCurr['id']]);
+        foreach ($payinguser as $rowCurr) {
+            if ($rowCurr === false) {
+                break;
+            }
+            $row2 = $rowCurr;
+        }
+
+        $doctors = $this->pdo->prepare("SELECT * FROM doctors WHERE doctors.id = :userid");
+        $doctors->execute(['userid'=>$rowCurr['id']]);
+        foreach ($doctors as $rowCurr) {
+            if ($rowCurr === false) {
+                break;
+            }
+            $row3 = $rowCurr;
+        }
+        $row = $row+$row2+$row3;
+        return $this->makeUserFromRow($row);
+
+        /*foreach ($stmt as $row) {
             if ($row === false) {
                 return false;
             }
             $payinguser = $this->pdo->prepare("SELECT * FROM payingusers WHERE payingusers.id = :userid");
             $payinguser->execute(['userid'=>$row['id']]);
             foreach ($payinguser as $row2) {
-            if ($row2 === false) {
-                return false;
+                if ($row2 === false) {
+                    return false;
+                }
+                $row = $row+$row2;
+                return $this->makeUserFromRow($row);
             }
-            $row = $row+$row2;
-            return $this->makeUserFromRow($row);
-        }
-
+        }*/
     }
-}
 
         public function setIsPaying($user)
     {
@@ -170,10 +206,6 @@ class UserRepository
         return $stmt->execute();
     }
 
-    /**
-     * @param $user
-     * @return string
-     */
     public function getIsAdmin($user)
     {
         $query = "SELECT isadmin FROM users WHERE user=:user";
@@ -198,17 +230,12 @@ class UserRepository
     }
 
     public function save(User $user)
-    {
-        echo "TORSTEIN";
-        echo $user->getUserId();
-        echo $user->getUsername();
+    {;
         if ($user->getUserId() === null) {
             return $this->saveNewUser($user);
-            echo "NEW USER";
         }
 
-        echo "EXISITNG USER";
-        $this->saveExistingUser($user);
+        return $this->saveExistingUser($user);
     }
 
     public function saveNewUser(User $user)
@@ -231,6 +258,7 @@ class UserRepository
             'address'=>$user->getAddress(),
             'postcode'=>$user->getPostcode()
         ]);
+
     }
 
     public function saveExistingUser(User $user)
@@ -240,7 +268,7 @@ class UserRepository
             "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
         );
         // Execute and bind values all in one
-        $stmt->execute([
+        return $stmt->execute([
             'userid'=>$user->getUserId(),
             'email'=>$user->getEmail(),
             'age'=>$user->getAge(),
@@ -250,8 +278,128 @@ class UserRepository
             'address'=>$user->getAddress(),
             'postcode'=>$user->getPostcode()
         ]);
+    }
+    /*
+        if ($user->getIspayinguser()){
+            if($user->getIsdoctor()){
+                $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
+                UPDATE users " .
+                    "SET email=:email,
+                    age=:age,
+                    bio=:bio,
+                    isadmin=:isadmin,
+                    fullname=:fullname,
+                    address=:address,
+                    postcode=:postcode
+                    WHERE id=:userid;
 
-        if ($user->getIsdoctor()){
+                UPDATE payingusers " .
+                    "SET banr=:bnr,
+                    ispaying=:ispayinguser,
+                    totalpayed=:totalpayed
+                    WHERE id=:userid;
+
+                UPDATE doctors".
+                    "SET totalearned=:totalearned
+                    WHERE id=:userid
+
+                    COMMIT;");
+                return $stmt->execute([
+                    'userid'=>$user->getUserId(),
+                    'email'=>$user->getEmail(),
+                    'age'=>$user->getAge(),
+                    'bio'=>$user->getBio(),
+                    'isadmin'=>$user->isAdmin(),
+                    'fullname'=>$user->getFullname(),
+                    'address'=>$user->getAddress(),
+                    'postcode'=>$user->getPostcode(),
+                    'banr'=>$user->getBnr(),
+                    'ispaying'=>$user->getIspayinguser(),
+                    'totalpayed'=>$user->getTotalpayed(),
+                    'totalearned'=>$user->getTotalearned()
+                ]);
+            } else {
+                $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
+                UPDATE users " .
+                    "SET email=:email,
+                    age=:age,
+                    bio=:bio,
+                    isadmin=:isadmin,
+                    fullname=:fullname,
+                    address=:address,
+                    postcode=:postcode
+                    WHERE id=:userid;
+
+                UPDATE payingusers " .
+                    "SET banr=:bnr,
+                    ispaying=:ispayinguser,
+                    totalpayed=:totalpayed
+                    WHERE id=:userid;
+
+                    COMMIT;");
+                return $stmt->execute([
+                    'userid'=>$user->getUserId(),
+                    'email'=>$user->getEmail(),
+                    'age'=>$user->getAge(),
+                    'bio'=>$user->getBio(),
+                    'isadmin'=>$user->isAdmin(),
+                    'fullname'=>$user->getFullname(),
+                    'address'=>$user->getAddress(),
+                    'postcode'=>$user->getPostcode(),
+                    'banr'=>$user->getBnr(),
+                    'ispaying'=>$user->getIspayinguser(),
+                    'totalpayed'=>$user->getTotalpayed()
+                ]);
+            }
+        } elseif ($user->getIsdoctor()){
+            $stmt = $this->pdo->prepare("BEGIN TRANSACTION;
+                UPDATE users " .
+                "SET email=:email,
+                    age=:age,
+                    bio=:bio,
+                    isadmin=:isadmin,
+                    fullname=:fullname,
+                    address=:address,
+                    postcode=:postcode
+                    WHERE id=:userid;
+
+                UPDATE doctors".
+                "SET totalearned=:totalearned
+                    WHERE id=:userid
+
+                    COMMIT;");
+            return $stmt->execute([
+                'userid'=>$user->getUserId(),
+                'email'=>$user->getEmail(),
+                'age'=>$user->getAge(),
+                'bio'=>$user->getBio(),
+                'isadmin'=>$user->isAdmin(),
+                'fullname'=>$user->getFullname(),
+                'address'=>$user->getAddress(),
+                'postcode'=>$user->getPostcode(),
+                'totalearned'=>$user->getTotalearned()
+            ]);
+        } else {
+            // Prepare statement
+            $stmt = $this->pdo->prepare("UPDATE users " .
+                "SET email=:email, age=:age, bio=:bio, isadmin=:isadmin, fullname=:fullname, address=:address, postcode=:postcode WHERE id=:userid"
+            );
+            // Execute and bind values all in one
+            return $stmt->execute([
+                'userid'=>$user->getUserId(),
+                'email'=>$user->getEmail(),
+                'age'=>$user->getAge(),
+                'bio'=>$user->getBio(),
+                'isadmin'=>$user->isAdmin(),
+                'fullname'=>$user->getFullname(),
+                'address'=>$user->getAddress(),
+                'postcode'=>$user->getPostcode()
+            ]);
+        }
+
+
+
+        /*if ($user->getIsdoctor()){
             $stmt2 = $this->pdo->prepare("UPDATE doctors".
                 "SET totalearned=:totalearned WHERE id=:userid"
             );
@@ -260,16 +408,37 @@ class UserRepository
 
         if ($user->getIspayinguser()) {
             $stmt = $this->pdo->prepare("UPDATE payingusers " .
-            "SET id=:userid, banr=:bnr, ispaying=:ispayinguser, totalpayed=:totalpayed"
+            "SET id=:userid, banr=:bnr, ispaying=:ispayinguser, totalpayed=:totalpayed WHERE "
+             );
+
+            $stmt->execute([
+                'userid'=>$user->getUserId(),
+                'bnr'=>$user->getBnr(),
+                'ispayinguser'=>$user->getIspayinguser(),
+                'totalpayed'=>$user->getTotalpayed()
+            ]);
+        }
+    }*/
+
+    public function saveSpendings($user)
+    {
+        $stmt = $this->pdo->prepare("UPDATE doctors
+                SET totalearned=:totalearned WHERE id=:userid"
+            );
+        return $stmt->execute(['totalearned'=>$user->getTotalEarned(),
+                        'userid'=>$user->getUserId()
+        ]);
+    }
+
+    public function saveEarnings($user)
+    {
+        $stmt = $this->pdo->prepare("UPDATE payingusers
+            SET totalpayed=:totalpayed WHERE id=:userid"
         );
 
-        $stmt->execute([
-            'userid'=>$user->getUserId(),
-            'bnr'=>$user->getBnr(),
-            'ispayinguser'=>$user->getIspayinguser(),
-            'totalpayed'=>$user->getTotalpayed()
+        return $stmt->execute(['userid'=>$user->getUserID(),
+                        'totalpayed'=>$user->getTotalPayed()
         ]);
-        }
     }
 
 }

@@ -14,7 +14,6 @@ class User
     protected $email   = null;
     protected $bio     = 'Bio is empty.';
     protected $age;
-    protected $bankcard;
     protected $isAdmin = 0;
     protected $bnr = 0;
     protected $totalpayed = 0;
@@ -139,9 +138,9 @@ class User
         return $this->bnr;
     }
 
-    public function setBnr($bnr)
+    public function setBnr($banr)
     {
-        $this->bnr = $bnr;
+        $this->bnr = $banr;
         return $this;
     }
 

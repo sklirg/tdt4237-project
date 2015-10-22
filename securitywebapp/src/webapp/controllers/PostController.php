@@ -73,17 +73,20 @@ class PostController extends Controller
 
     public function addComment($postId)
     {
+        echo "Comment added";
         if ($this->postRepository->checkAnsweredByDoctor($postId) == 0) {
             if($this->auth->doctor()) {
                 //Add 10$ to doctor's wallet
                 $user = $this->auth->user();
+                echo $user->getTotalEarned();
                 $user->setTotalEarned($user->getTotalEarned()+10);
-                $this->userRepository->save($user);
+                $this->userRepository->saveEarnings($user);
                 //Add 10$ to the post-author spent.
                 $authorName = $this->postRepository->find($postId)->getAuthor();
                 $author = $this->userRepository->findByUser($authorName);
+                echo $author->getTotalPayed();
                 $author->setTotalpayed($author->getTotalPayed()+10);
-                $this->userRepository->save($author);
+                $this->userRepository->saveSpendings($author);
                 //Set doctoranswered flag.
                 $post = $this->postRepository->find($postId);
                 $post->setIsAnsweredByDoctor(1);

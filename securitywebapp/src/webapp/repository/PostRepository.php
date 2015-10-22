@@ -69,8 +69,6 @@ class PostRepository
 
         public function allDoctor()
     {
-
-        //$sql   = "SELECT * FROM posts INNER JOIN users post ON posts.author=users.user INNER JOIN payingusers ON post.id=payingusers.id";
         $sql = "SELECT * FROM posts,users,payingusers WHERE posts.author = users.user AND payingusers.id = users.id AND payingusers.ispaying = 1";
         $results = $this->db->query($sql);
 

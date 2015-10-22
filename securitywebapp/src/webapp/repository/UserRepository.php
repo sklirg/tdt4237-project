@@ -290,13 +290,46 @@ class UserRepository
         ]);
     }
 
+    public function saveIsPaying($user){
+        $a = $this->checkIsPayingExists($user);
+        if ($a == 1) {
+            $stmt = $this->pdo->prepare("UPDATE payingusers
+                SET ispaying=:ispaying, banr=:banr WHERE id=:userid"
+            );
+            return $stmt->execute(['ispaying'=>$user->getIspayinguser(),
+                'userid'=>$user->getUserId(),
+                'banr'=>$user->getBnr()
+            ]);
+        } else {
+            $q = "INSERT INTO payingusers (id , banr , ispaying , totalpayed ) " . "VALUES(:id, :banr, :ispaying, :totalpayed)";
+            $stmt = $this->pdo->prepare($q);
+            return $stmt->execute([
+                'id'=>$user->getUserId(),
+                'banr'=>$user->getBnr(),
+                'ispaying'=>$user->getIspayinguser(),
+                'totalpayed'=>$user->getTotalpayed()
+            ]);
+        }
+    }
+
+    public function checkIsPayingExists($user){
+        $stmt = "SELECT CASE WHEN EXISTS(
+                SELECT * FROM payingusers WHERE id =:id)
+                THEN CAST(1 AS BIT)
+                ELSE CAST(0 AS BIT) END";
+
+        $statment = $this->pdo->prepare($stmt);
+        $statment->execute(["id"=>$user->getUserId()]);
+        return $statment->fetchColumn();
+    }
+
     public function saveEarnings($user, $amount)
     {
         $stmt = $this->pdo->prepare("UPDATE doctors
             SET totalearned= totalearned + :totalearned WHERE id=:userid"
         );
 
-        return $stmt->execute(['userid'=>$user->getUserID(),
+        return $stmt->execute(['userid'=>$user->getUserId(),
                         'totalearned'=>$amount
         ]);
     }

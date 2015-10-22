@@ -66,7 +66,6 @@ class Auth
     public function doctor()
     {
         if ($this->check()) {
-
             return $this->userRepository->getIsDoctor($_SESSION['user']) == 1;
         }
     }

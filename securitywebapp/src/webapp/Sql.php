@@ -47,17 +47,20 @@ class Sql
         $hash2 = Hash::createAPIHash('bobdylan');
         $hash3 = Hash::createAPIHash('liverpool');
         $hash4 = Hash::createAPIHash('tardis');
+        $hash5 = Hash::createAPIHash('Testuser123');
 
         $q1 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('admin', '$hash1', 1, 'admin', 'homebase', '9090')";
         $q2 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bob', '$hash2', 1, 'Robert Green', 'Greenland Grove 9', '2010')";
-        $q3 = "INSERT INTO users(id, user, pass, isadmin, fullname, address, postcode) VALUES (99, 'bjarni', '$hash3', 1, 'Bjarni Torgmund', 'Hummerdale 12', '4120')";
-        $q4 = "INSERT INTO users(id, user, pass, isadmin, fullname, address, postcode) VALUES (1001, 'drwho', '$hash4', 0, 'The Doctor', 'Gallifrey', '4242');";
+        $q3 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('bjarni', '$hash3', 1, 'Bjarni Torgmund', 'Hummerdale 12', '4120')";
+        $q4 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('drwho', '$hash4', 0, 'The Doctor', 'Gallifrey', '4242');";
+        $q5 = "INSERT INTO users(user, pass, isadmin, fullname, address, postcode) VALUES ('testuser', '$hash5', 1, 'Testuser123', 'NTNU', '0001');";
+
 
         self::$pdo->exec($q1);
         self::$pdo->exec($q2);
         self::$pdo->exec($q3);
         self::$pdo->exec($q4);
-
+        self::$pdo->exec($q5);
 
         print "[tdt4237] Done inserting dummy users.".PHP_EOL;
     }

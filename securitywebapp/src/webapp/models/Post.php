@@ -18,60 +18,71 @@ class Post
     protected $isAnsweredByDoctor;
 
 
-    public function getPostId() {
+    public function getPostId()
+    {
         return $this->postId;
 
     }
 
-    public function setPostId($postId) {
+    public function setPostId($postId)
+    {
         $this->postId = $postId;
         return $this;
     }
 
-    public function getAuthor() {
+    public function getAuthor()
+    {
         return $this->author;
     }
 
-    public function setAuthor($author) {
+    public function setAuthor($author)
+    {
         $this->author = $author;
         return $this;
     }
 
-    public function getDate() {
+    public function getDate()
+    {
         return $this->date;
     }
 
-    public function setDate($date) {
+    public function setDate($date)
+    {
         $this->date = $date;
         return $this;
     }
 
-    public function getContent() {
+    public function getContent()
+    {
         return $this->content;
     }
 
-    public function setContent($content) {
+    public function setContent($content)
+    {
         $this->content = $content;
         return $this;
     }
 
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
 
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
-    public function setDoctor($status) {
+    public function setDoctor($status)
+    {
         $this->isAnsweredByDoctor = $status;
         return $this;
     }
 
-    public function getDoctor() {
+    public function getDoctor()
+    {
         return $this->isAnsweredByDoctor;
     }
-
 
 }

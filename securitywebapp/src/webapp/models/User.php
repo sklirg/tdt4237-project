@@ -14,7 +14,6 @@ class User
     protected $email   = null;
     protected $bio     = 'Bio is empty.';
     protected $age;
-    protected $bankcard;
     protected $isAdmin = 0;
     protected $bnr = 0;
     protected $totalpayed = 0;
@@ -139,9 +138,10 @@ class User
         return $this->bnr;
     }
 
-    public function setBnr($bnr)
+    public function setBnr($banr)
     {
-        $this->bnr = $bnr;
+        $this->bnr = $banr;
+        return $this;
     }
 
     public function getIsdoctor()
@@ -152,6 +152,7 @@ class User
     public function setIsdoctor($isdoctor)
     {
         $this->isdoctor = $isdoctor;
+        return $this;
     }
 
     public function getIspayinguser()
@@ -160,12 +161,15 @@ class User
     }
 
     public function setIspayinguser($ispayinguser)
+
     {   
         if ($ispayinguser == 1) {
             $this->ispayinguser = $ispayinguser;
+            return $this;
         }
         else{
             $this->ispayinguser = 0;
+            return $this;
         }
     }
 
@@ -177,6 +181,7 @@ class User
     public function setTotalpayed($totalpayed)
     {
         $this->totalpayed = $totalpayed;
+        return $this;
     }
 
     public function getTotalearned()
@@ -187,6 +192,7 @@ class User
     public function setTotalearned($totalearned)
     {
         $this->totalearned = $totalearned;
+        return $this;
     }
 
 }

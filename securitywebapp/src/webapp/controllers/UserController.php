@@ -158,6 +158,7 @@ class UserController extends Controller
 
 
             $this->app->flashNow('info', 'Your profile was successfully saved.');
+            $this->userRepository->saveIsPaying($user);
             
             return $this->render('edituser.twig', ['user' => $user]);
 

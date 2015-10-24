@@ -86,7 +86,7 @@ class Sql
 
     static function insertPayingUser()
     {
-        $userid = 99;
+        $userid = 3;
         $banr = '1020304050607080';
 
         $q1 = "INSERT INTO payingusers (id, banr, ispaying, totalpayed) VALUES ('$userid', '$banr', 1, 0);";
@@ -96,7 +96,7 @@ class Sql
 
     static function insertDummyDoctor()
     {
-        $userid = 1001;
+        $userid = 4;
 
         $q1 = "INSERT INTO doctors (id, totalearned) VALUES ('$userid', 0);";
         self::$pdo->exec($q1);

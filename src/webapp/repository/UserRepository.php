@@ -116,7 +116,11 @@ class UserRepository
         } elseif (!($doctors === false)) {
                 return $this->makeUserFromRow($users+$doctors);
         } else {
-            return $this->makeUserFromRow($users);
+            if($users['id'] == null){
+                return false;
+            } else {
+                return $this->makeUserFromRow($users);
+            }
         }
 
         // Don't ask
